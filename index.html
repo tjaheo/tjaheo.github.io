@@ -39,6 +39,11 @@
   .skill[aria-pressed=true] { border-color:var(--amber); color:var(--amber); background:#3b2f17; }
   .skill.owned::after { content:""; }
   .detail { margin-top:14px; padding:10px 12px; border-radius:8px; background:var(--tile); min-height:44px; }
+  .stat-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; align-items:center; }
+  .stat { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:6px 12px; font-size:14px; }
+  .stat input { width:64px; flex:none; padding:4px 6px; margin-left:6px; }
+  .stat.bad { color:var(--err); }
+  .skill[aria-disabled=true] { opacity:.35; }
   .empty, .list li { color:var(--muted); }
   .list { padding-left:18px; }
 </style>
@@ -49,6 +54,11 @@
     <label for="farmId">Enter Farm:</label>
     <input id="farmId" inputmode="numeric" placeholder="Contoh: 3661">
     <button class="go" id="search">Search</button>
+  </div>
+  <div class="stat-row">
+    <label class="stat">Level Bumpkin<input id="level" type="number" min="1" max="200"></label>
+    <div class="stat" id="pts"></div>
+    <div class="stat" id="shard"></div>
   </div>
   <div id="status" role="status"></div>
 
@@ -68,13 +78,52 @@
   const TABS = ["Skills", "Collectibles", "Wearables", "Buds", "Temporary Buffs", "Updates Made"];
   const TTL = 5 * 60 * 1000;
 
-  let tab = "Skills", cat = "Minerals", active = null;
+  let tab = "Skills", cat = "Minerals", active = null, shards = null;
   const selected = new Set();
 
-  const catPoints = (c) => (SKILLS[c] || []).filter(s => selected.has(s.name)).reduce((n, s) => n + s.points, 0);
-  const totalPoints = () => CATEGORIES.reduce((n, c) => n + catPoints(c), 0);
+  const cost = (s) => s.points ?? TIER_COST[s.tier] ?? 1;
+  const spent = (c, maxTier = 99) => (SKILLS[c] || [])
+    .filter(s => selected.has(s.name) && s.tier <= maxTier).reduce((n, s) => n + cost(s), 0);
+  const catPoints = (c) => spent(c);
+  const totalPoints = () => CATEGORIES.reduce((n, c) => n + spent(c), 0);
+  const need = (t) => TIER_REQUIRE[t] ?? 0;
+  const unlocked = (c, t) => t <= 1 || spent(c, t - 1) >= need(t);
+  const validCat = (c) => (SKILLS[c] || []).every(s => !selected.has(s.name) || unlocked(c, s.tier));
+  const level = () => Math.max(1, parseInt($("level").value, 10) || 1);
+  const available = () => pointsForLevel(level());
 
   function status(msg, err) { $("status").textContent = msg; $("status").className = err ? "err" : ""; }
+
+  function renderStats() {
+    const left = available() - totalPoints();
+    $("pts").className = "stat" + (left < 0 ? " bad" : "");
+    $("pts").textContent = `Skill Points: ${totalPoints()} / ${available()} (sisa ${left})`;
+    $("shard").textContent = `Ascension Shard: ${shards ?? "-"}`;
+  }
+
+  function toggle(s) {
+    active = s;
+    if (selected.has(s.name)) {
+      selected.delete(s.name);
+      if (!validCat(cat)) {
+        selected.add(s.name);
+        status(`${s.name} tidak bisa dilepas: skill tier atas masih bergantung padanya.`, true);
+        return render();
+      }
+    } else {
+      if (!unlocked(cat, s.tier)) {
+        status(`Tier ${s.tier} butuh ${need(s.tier)} poin dari tier di bawahnya (sekarang ${spent(cat, s.tier - 1)}).`, true);
+        return render();
+      }
+      if (totalPoints() + cost(s) > available()) {
+        status(`Skill Points tidak cukup (butuh ${cost(s)}, sisa ${available() - totalPoints()}).`, true);
+        return render();
+      }
+      selected.add(s.name);
+    }
+    status("");
+    render();
+  }
 
   function renderTabs() {
     const box = $("tabs"); box.textContent = "";
@@ -109,30 +158,28 @@
     if (!list.length) { p.append(el("p", "empty", "Belum ada skill di kategori ini. Tambahkan di data.js.")); return; }
 
     [...new Set(list.map(s => s.tier))].sort().forEach((t) => {
-      if (t > 1) p.append(el("h3", "", `Tier ${t} - Points to Unlock: ${TIER_UNLOCK[t] ?? "?"}`));
+      if (t > 1) p.append(el("h3", "", `Tier ${t} - butuh ${need(t)} poin dari tier bawah (sekarang ${spent(cat, t - 1)})`));
       const row = el("div", "tier");
       list.filter(s => s.tier === t).forEach((s) => {
         const b = el("button", "skill");
         b.setAttribute("aria-pressed", selected.has(s.name));
         b.setAttribute("aria-label", s.name);
+        if (!selected.has(s.name) && !unlocked(cat, s.tier)) b.setAttribute("aria-disabled", "true");
         if (s.icon) { const i = el("img"); i.src = s.icon; i.alt = ""; b.append(i); }
         else b.textContent = s.name.split(/[\s'-]+/).map(w => w[0]).join("").slice(0, 3).toUpperCase();
-        b.onclick = () => {
-          selected.has(s.name) ? selected.delete(s.name) : selected.add(s.name);
-          active = s; render();
-        };
+        b.onclick = () => toggle(s);
         row.append(b);
       });
       p.append(row);
     });
 
     const d = el("div", "detail");
-    d.textContent = active ? `${active.name}: ${active.effect || "Efek belum diisi di data.js."}` : "Ketuk skill untuk memilih dan melihat efeknya.";
+    d.textContent = active ? `${active.name} (Tier ${active.tier}, biaya ${cost(active)} poin): ${active.effect || "Efek belum diisi di data.js."}` : "Ketuk skill untuk memilih dan melihat efeknya.";
     p.append(d);
   }
 
   function render() {
-    renderTabs();
+    renderTabs(); renderStats();
     const p = $("panel"); p.textContent = "";
     if (tab === "Skills") return renderSkills(p);
     if (tab === "Updates Made") {
@@ -153,6 +200,7 @@
     const known = new Set(Object.values(SKILLS).flat().map(s => s.name));
     selected.clear();
     owned.filter(n => known.has(n)).forEach(n => selected.add(n));
+    shards = Number(farm.inventory?.["Ascension Shard"] ?? 0);
     render();
   }
 
@@ -177,6 +225,8 @@
   $("search").onclick = search;
   $("farmId").onkeydown = (e) => { if (e.key === "Enter") search(); };
   try { $("farmId").value = localStorage.getItem("farmId") || ""; } catch {}
+  try { $("level").value = localStorage.getItem("level") || 80; } catch { $("level").value = 80; }
+  $("level").oninput = () => { try { localStorage.setItem("level", $("level").value); } catch {} render(); };
   render();
 </script>
 </body>
