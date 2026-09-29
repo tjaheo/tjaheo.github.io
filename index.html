@@ -86,8 +86,8 @@
     .filter(s => selected.has(s.name) && s.tier <= maxTier).reduce((n, s) => n + cost(s), 0);
   const catPoints = (c) => spent(c);
   const totalPoints = () => CATEGORIES.reduce((n, c) => n + spent(c), 0);
-  const need = (t) => TIER_REQUIRE[t] ?? 0;
-  const unlocked = (c, t) => t <= 1 || spent(c, t - 1) >= need(t);
+  const need = (c, t) => (TIER_REQUIRE[c] || TIER_REQUIRE.default)[t] ?? 0;
+  const unlocked = (c, t) => t <= 1 || spent(c, t - 1) >= need(c, t);
   const validCat = (c) => (SKILLS[c] || []).every(s => !selected.has(s.name) || unlocked(c, s.tier));
   const level = () => Math.max(0, parseInt($("level").value, 10) || 0);
   const available = () => pointsForLevel(level());
@@ -112,7 +112,7 @@
       }
     } else {
       if (!unlocked(cat, s.tier)) {
-        status(`Tier ${s.tier} butuh ${need(s.tier)} poin dari tier di bawahnya (sekarang ${spent(cat, s.tier - 1)}).`, true);
+        status(`Tier ${s.tier} butuh ${need(cat, s.tier)} poin dari tier di bawahnya (sekarang ${spent(cat, s.tier - 1)}).`, true);
         return render();
       }
       if (totalPoints() + cost(s) > available()) {
@@ -158,7 +158,7 @@
     if (!list.length) { p.append(el("p", "empty", "Belum ada skill di kategori ini. Tambahkan di data.js.")); return; }
 
     [...new Set(list.map(s => s.tier))].sort().forEach((t) => {
-      if (t > 1) p.append(el("h3", "", `Tier ${t} - butuh ${need(t)} poin dari tier bawah (sekarang ${spent(cat, t - 1)})`));
+      if (t > 1) p.append(el("h3", "", `Tier ${t} - butuh ${need(cat, t)} poin dari tier bawah (sekarang ${spent(cat, t - 1)})`));
       const row = el("div", "tier");
       list.filter(s => s.tier === t).forEach((s) => {
         const b = el("button", "skill");

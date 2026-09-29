@@ -3,13 +3,28 @@
 
 const WORKER = "https://sfl.tjaheo89.workers.dev"; // alamat Worker kamu
 
-// Syarat membuka tier: total poin yang sudah dipakai di tree yang sama
-// pada tier DI BAWAHNYA. Tier 2 butuh 2 poin dari tier 1.
-// Tier 3 butuh total 5 poin dari tier 1 dan 2.
-const TIER_REQUIRE = { 1: 0, 2: 2, 3: 5 };
+// Syarat membuka tier, BEDA di tiap tree (dari kode game). Nilainya total poin
+// yang sudah dipakai di tree itu pada tier di bawahnya: tier 2 = poin tier 1,
+// tier 3 = poin tier 1 + 2. Poin skill tier 3 tidak dihitung.
+// Nama tree mengikuti CATEGORIES di bawah ("Minerals" = tree "Mining" di game).
+const TIER_REQUIRE = {
+  "Crops":          { 1: 0, 2: 3, 3: 7 },
+  "Minerals":       { 1: 0, 2: 3, 3: 7 },
+  "Compost":        { 1: 0, 2: 3, 3: 7 },
+  "Aging":          { 1: 0, 2: 3, 3: 7 },
+  "Animals":        { 1: 0, 2: 4, 3: 8 },
+  "Trees":          { 1: 0, 2: 2, 3: 5 },
+  "Fishing":        { 1: 0, 2: 2, 3: 5 },
+  "Cooking":        { 1: 0, 2: 2, 3: 5 },
+  "Fruit Patch":    { 1: 0, 2: 2, 3: 5 },
+  "Bees & Flowers": { 1: 0, 2: 2, 3: 5 },
+  "Greenhouse":     { 1: 0, 2: 2, 3: 5 },
+  "Machinery":      { 1: 0, 2: 2, 3: 5 },
+  "default":        { 1: 0, 2: 2, 3: 5 }, // untuk tree yang tidak tercantum
+};
 
 // Biaya default mengambil skill menurut tier.
-// PLACEHOLDER: cek di game. Bisa ditimpa per skill dengan field "points".
+// Sesuai game: tier 1 = 1, tier 2 = 2, tier 3 = 3. Bisa ditimpa per skill dengan field "points".
 const TIER_COST = { 1: 1, 2: 2, 3: 3 };
 
 // Total skill point pada level tertentu: 1 poin per level (docs resmi),
@@ -59,18 +74,24 @@ const CATEGORIES = [
 // Format satu skill:
 // { name: "Nama persis di game", tier: 1, points: 1 (opsional), effect: "Deskripsi", icon: "url gambar (opsional)" }
 // "name" harus sama persis dengan nama di data farm agar tersinkron otomatis.
-// CATATAN: tier dan effect di bawah masih PLACEHOLDER. Cek dan isi sesuai game.
+// Data Minerals diambil dari kode game (di game bernama tree "Mining"), efek = rank 1.
 const SKILLS = {
   "Minerals": [
-    { name: "Frugal Miner",       tier: 1, effect: "" },
-    { name: "More Picks",         tier: 1, effect: "" },
-    { name: "Rocky Favor",        tier: 1, effect: "" },
-    { name: "Speed Miner",        tier: 2, effect: "" },
-    { name: "Rock'N'Roll",        tier: 2, effect: "" },
-    { name: "Fire Kissed",        tier: 2, effect: "" },
-    { name: "Forge-Ward Profits", tier: 3, effect: "" },
-    { name: "Golden Touch",       tier: 3, effect: "" },
-    { name: "Midas Rush",         tier: 3, effect: "" },
+    { name: "Rock'N'Roll", tier: 1, points: 1, effect: "+0.1 Stone Yield" },
+    { name: "Iron Bumpkin", tier: 1, points: 1, effect: "+0.1 Iron Yield" },
+    { name: "Speed Miner", tier: 1, points: 1, effect: "x0.8 Stone recovery time" },
+    { name: "Tap Prospector", tier: 1, points: 1, effect: "1 tap small mineral nodes" },
+    { name: "Forge-Ward Profits", tier: 1, points: 1, effect: "+20% Blacksmith deliveries revenue" },
+    { name: "Iron Hustle", tier: 2, points: 2, effect: "x0.7 Iron recovery time" },
+    { name: "Frugal Miner", tier: 2, points: 2, effect: "x0.8 all pickaxes coin cost" },
+    { name: "Rocky Favor", tier: 2, points: 2, effect: "+1 Stone yield; -0.5 Iron yield" },
+    { name: "Fire Kissed", tier: 2, points: 2, effect: "+1 Crimstone yield on 5th consecutive mine" },
+    { name: "Midas Sprint", tier: 2, points: 2, effect: "x0.9 Gold recovery time" },
+    { name: "Ferrous Favor", tier: 3, points: 3, effect: "+1 Iron yield; -0.5 Stone yield" },
+    { name: "Golden Touch", tier: 3, points: 3, effect: "+0.5 Gold Yield" },
+    { name: "More Picks", tier: 3, points: 3, effect: "Increased stock: +70 Pickaxe, +20 Stone Pickaxe, +7 Iron Pickaxe, +2 Gold Pickaxe" },
+    { name: "Fireside Alchemist", tier: 3, points: 3, effect: "x0.85 Crimstone recovery time" },
+    { name: "Midas Rush", tier: 3, points: 3, effect: "x0.8 Gold recovery time" },
   ],
   // Tambah kategori lain dengan format yang sama.
 };
@@ -80,4 +101,5 @@ const UPDATES = [
   { date: "2026-09-30", note: "Versi awal: layout skill tree, kategori Minerals." },
   { date: "2026-09-30", note: "Tambah level Bumpkin, batas skill point, dan syarat tier." },
   { date: "2026-09-30", note: "Level Bumpkin dihitung otomatis dari XP farm." },
+  { date: "2026-09-30", note: "Skill Minerals lengkap (15 skill), biaya, dan syarat tier diambil dari kode game." },
 ];
