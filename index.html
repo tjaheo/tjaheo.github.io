@@ -1,12 +1,48 @@
-   <!DOCTYPE html>
-   <html lang="id">
-   <head>
-     <meta charset="UTF-8">
-     <meta name="viewport" content="width=device-width, initial-scale=1">
-     <title>Website Saya</title>
-   </head>
-   <body>
-     <h1>Halo, dunia!</h1>
-     <p>Ini website pribadi saya.</p>
-   </body>
-   </html>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SFL Farm Sync</title>
+<style>
+  :root {
+    --bg: #e8eedd; --card: #f7f9f1; --ink: #23301f; --muted: #5d6b55;
+    --accent: #e3a712; --leaf: #4e7a3a; --line: #c9d3bb; --err: #a4322a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #171d14; --card: #212a1d; --ink: #e6ecd9; --muted: #9aa78f;
+            --line: #33402d; --leaf: #7fb069; --err: #ff8a80; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 16px/1.5 system-ui, sans-serif; }
+  main { max-width: 640px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font: 700 28px/1.2 Georgia, serif; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+  .bar { display: flex; gap: 8px; }
+  input, button { font: inherit; padding: 10px 12px; border-radius: 6px;
+                  border: 1px solid var(--line); background: var(--card); color: var(--ink); }
+  input { flex: 1; min-width: 0; }
+  button { background: var(--accent); border-color: var(--accent); color: #2b2100;
+           font-weight: 600; cursor: pointer; }
+  button:disabled { opacity: .6; cursor: wait; }
+  :focus-visible { outline: 3px solid var(--leaf); outline-offset: 2px; }
+  #status { min-height: 1.5em; margin: 12px 0; color: var(--muted); }
+  #status.err { color: var(--err); }
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+  .stat b { display: block; font: 700 22px Georgia, serif; }
+  .stat span { color: var(--muted); font-size: 14px; }
+  #filter { width: 100%; margin-bottom: 8px; }
+  .table { background: var(--card); border: 1px solid var(--line); border-radius: 8px;
+           max-height: 55vh; overflow-y: auto; }
+  .row { display: flex; justify-content: space-between; padding: 8px 12px;
+         border-bottom: 1px solid var(--line); }
+  .row:last-child { border-bottom: 0; }
+  .row span:last-child { font-variant-numeric: tabular-nums; color: var(--leaf); font-weight: 600; }
+  [hidden] { display: none; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Sinkron Farm</h1>
