@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SFL Farm Sync</title>
+<style>
+  :root {
+    --bg: #e8eedd; --card: #f7f9f1; --ink: #23301f; --muted: #5d6b55;
+    --accent: #e3a712; --leaf: #4e7a3a; --line: #c9d3bb; --err: #a4322a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #171d14; --card: #212a1d; --ink: #e6ecd9; --muted: #9aa78f;
+            --line: #33402d; --leaf: #7fb069; --err: #ff8a80; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 16px/1.5 system-ui, sans-serif; }
+  main { max-width: 640px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font: 700 28px/1.2 Georgia, serif; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+  .bar { display: flex; gap: 8px; }
+  input, button { font: inherit; padding: 10px 12px; border-radius: 6px;
+                  border: 1px solid var(--line); background: var(--card); color: var(--ink); }
+  input { flex: 1; min-width: 0; }
+  button { background: var(--accent); border-color: var(--accent); color: #2b2100;
+           font-weight: 600; cursor: pointer; }
+  button:disabled { opacity: .6; cursor: wait; }
+  :focus-visible { outline: 3px solid var(--leaf); outline-offset: 2px; }
+  #status { min-height: 1.5em; margin: 12px 0; color: var(--muted); }
+  #status.err { color: var(--err); }
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+  .stat b { display: block; font: 700 22px Georgia, serif; }
+  .stat span { color: var(--muted); font-size: 14px; }
+  #filter { width: 100%; margin-bottom: 8px; }
+  .table { background: var(--card); border: 1px solid var(--line); border-radius: 8px;
+           max-height: 55vh; overflow-y: auto; }
+  .row { display: flex; justify-content: space-between; padding: 8px 12px;
+         border-bottom: 1px solid var(--line); }
+  .row:last-child { border-bottom: 0; }
+  .row span:last-child { font-variant-numeric: tabular-nums; color: var(--leaf); font-weight: 600; }
+  [hidden] { display: none; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Sinkron Farm</h1>
+  <p class="sub">Masukkan Farm ID untuk memuat coins dan inventory.</p>
+
+  <div class="bar">
+    <input id="farmId" type="text" inputmode="numeric" placeholder="Farm ID" aria-label="Farm ID">
+    <button id="btn">Muat farm</button>
+  </div>
+  <div id="status" role="status"></div>
+
+  <section id="result" hidden>
+    <div class="stats">
+      <div class="stat"><b id="coins">-</b><span>Coins</span></div>
+      <div class="stat"><b id="balance">-</b><span>Balance</span></div>
+    </div>
+    <input id="filter" type="search" placeholder="Cari item di inventory" aria-label="Cari item">
+    <div class="table" id="inv"></div>
+  </section>
+</main>
+
+<script>
+  const WORKER = "https://sfl.tjaheo89.workers.dev"; // alamat Worker kamu
+  const TTL = 5 * 60 * 1000; // simpan hasil 5 menit agar tidak kena batas request
+
+  const $ = (id) => document.getElementById(id);
+  let inventory = [];
+
+  function setStatus(msg, isErr) {
+    $("status").textContent = msg;
+    $("status").className = isErr ? "err" : "";
+  }
+
+  function render(farm) {
+    $("coins").textContent = Number(farm.coins).toLocaleString("id-ID", { maximumFractionDigits: 2 });
+    $("balance").textContent = Number(farm.balance).toLocaleString("id-ID", { maximumFractionDigits: 4 });
+    inventory = Object.entries(farm.inventory || {}).sort((a, b) => a[0].localeCompare(b[0]));
+    drawInventory();
+    $("result").hidden = false;
+  }
+
+  function drawInventory() {
+    const q = $("filter").value.trim().toLowerCase();
+    const box = $("inv");
+    box.textContent = "";
+    const list = inventory.filter(([name]) => name.toLowerCase().includes(q));
+    if (!list.length) { box.textContent = "Tidak ada item yang cocok."; box.style.padding = "12px"; return; }
+    box.style.padding = "0";
+    for (const [name, qty] of list) {
+      const row = document.createElement("div");
+      row.className = "row";
+      const a = document.createElement("span"); a.textContent = name;
+      const b = document.createElement("span"); b.textContent = Number(qty).toLocaleString("id-ID");
+      row.append(a, b);
+      box.append(row);
+    }
+  }
+
+  function readCache(id) {
+    try {
+      const c = JSON.parse(localStorage.getItem("farm:" + id));
+      return c && c.farm ? c : null;
+    } catch { return null; }
+  }
+
+  async function load() {
+    const id = $("farmId").value.trim();
+    if (!/^\d+$/.test(id)) return setStatus("Farm ID harus berupa angka.", true);
+
+    const cached = readCache(id);
+    if (cached && Date.now() - cached.t < TTL) {
+      render(cached.farm);
+      return setStatus("Data dari penyimpanan lokal (kurang dari 5 menit).");
+    }
+
+    $("btn").disabled = true;
+    setStatus("Memuat data farm...");
+    try {
+      const res = await fetch(`${WORKER}/?id=${encodeURIComponent(id)}`);
+      if (res.status === 429) throw new Error("Terlalu banyak permintaan. Tunggu 1-2 menit lalu coba lagi.");
+      if (!res.ok) throw new Error(`Gagal memuat (status ${res.status}).`);
+      const data = await res.json();
+      try { localStorage.setItem("farm:" + id, JSON.stringify({ t: Date.now(), farm: data.farm })); } catch {}
+      try { localStorage.setItem("farmId", id); } catch {}
+      render(data.farm);
+      setStatus("Data farm berhasil dimuat.");
+    } catch (e) {
+      if (cached) { render(cached.farm); setStatus(e.message + " Menampilkan data tersimpan.", true); }
+      else setStatus(e.message, true);
+    } finally {
+      $("btn").disabled = false;
+    }
+  }
+
+  $("btn").addEventListener("click", load);
+  $("farmId").addEventListener("keydown", (e) => { if (e.key === "Enter") load(); });
+  $("filter").addEventListener("input", drawInventory);
+  try { $("farmId").value = localStorage.getItem("farmId") || ""; } catch {}
+</script>
+</body>
+</html>
