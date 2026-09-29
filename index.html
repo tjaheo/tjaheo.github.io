@@ -3,144 +3,181 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SFL Farm Sync</title>
+<title>SFL Skill Tree</title>
 <style>
-  :root {
-    --bg: #e8eedd; --card: #f7f9f1; --ink: #23301f; --muted: #5d6b55;
-    --accent: #e3a712; --leaf: #4e7a3a; --line: #c9d3bb; --err: #a4322a;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root { --bg: #171d14; --card: #212a1d; --ink: #e6ecd9; --muted: #9aa78f;
-            --line: #33402d; --leaf: #7fb069; --err: #ff8a80; }
-  }
+  :root { --bg:#16130f; --panel:#211c15; --tile:#2c2519; --line:#6b5330; --amber:#f0a020;
+          --ink:#efe6d4; --muted:#a39882; --ok:#7fb069; --err:#ff8a80; }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--ink);
-         font: 16px/1.5 system-ui, sans-serif; }
-  main { max-width: 640px; margin: 0 auto; padding: 24px 16px 48px; }
-  h1 { font: 700 28px/1.2 Georgia, serif; margin: 0 0 4px; }
-  .sub { color: var(--muted); margin: 0 0 20px; }
-  .bar { display: flex; gap: 8px; }
-  input, button { font: inherit; padding: 10px 12px; border-radius: 6px;
-                  border: 1px solid var(--line); background: var(--card); color: var(--ink); }
-  input { flex: 1; min-width: 0; }
-  button { background: var(--accent); border-color: var(--accent); color: #2b2100;
-           font-weight: 600; cursor: pointer; }
-  button:disabled { opacity: .6; cursor: wait; }
-  :focus-visible { outline: 3px solid var(--leaf); outline-offset: 2px; }
-  #status { min-height: 1.5em; margin: 12px 0; color: var(--muted); }
-  #status.err { color: var(--err); }
-  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
-  .stat { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
-  .stat b { display: block; font: 700 22px Georgia, serif; }
-  .stat span { color: var(--muted); font-size: 14px; }
-  #filter { width: 100%; margin-bottom: 8px; }
-  .table { background: var(--card); border: 1px solid var(--line); border-radius: 8px;
-           max-height: 55vh; overflow-y: auto; }
-  .row { display: flex; justify-content: space-between; padding: 8px 12px;
-         border-bottom: 1px solid var(--line); }
-  .row:last-child { border-bottom: 0; }
-  .row span:last-child { font-variant-numeric: tabular-nums; color: var(--leaf); font-weight: 600; }
-  [hidden] { display: none; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.5 system-ui,sans-serif; }
+  main { max-width:820px; margin:0 auto; padding:16px; }
+  .bar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .bar label { color:var(--amber); font-weight:700; }
+  input { flex:1; min-width:120px; padding:10px 12px; border-radius:8px; border:1px solid var(--line);
+          background:var(--panel); color:var(--ink); font:inherit; }
+  button { font:inherit; cursor:pointer; }
+  .go { padding:10px 18px; border-radius:20px; border:0; background:var(--amber); color:#2b1c00; font-weight:700; }
+  .go:disabled { opacity:.6; cursor:wait; }
+  :focus-visible { outline:3px solid var(--amber); outline-offset:2px; }
+  #status { min-height:1.5em; margin:10px 0 0; color:var(--muted); font-size:14px; }
+  #status.err { color:var(--err); }
+  .tabs { display:flex; gap:4px; overflow-x:auto; margin-top:12px; }
+  .tab { padding:10px 16px; border:1px solid var(--line); border-bottom:0; border-radius:10px 10px 0 0;
+         background:var(--tile); color:var(--amber); font-weight:700; white-space:nowrap; }
+  .tab[aria-selected=true] { background:var(--panel); color:var(--ink); }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:0 12px 12px 12px; padding:16px; min-height:320px; }
+  .head { display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; }
+  .head h2 { margin:0; font-size:20px; color:var(--amber); }
+  .clear { padding:8px 14px; border-radius:18px; border:0; background:var(--amber); color:#2b1c00; font-weight:700; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; margin:14px 0; padding-bottom:14px; border-bottom:1px solid var(--line); }
+  .chip { padding:6px 12px; border-radius:8px; border:0; background:transparent; color:var(--ink); }
+  .chip[aria-pressed=true] { background:var(--amber); color:#2b1c00; font-weight:700; }
+  h3 { margin:16px 0 8px; font-size:15px; color:var(--amber); }
+  .tier { display:flex; flex-wrap:wrap; gap:8px; }
+  .skill { width:52px; height:52px; border-radius:8px; border:2px solid transparent; background:var(--tile);
+           color:var(--muted); font-weight:700; font-size:13px; padding:0; overflow:hidden; }
+  .skill img { width:100%; height:100%; object-fit:cover; }
+  .skill[aria-pressed=true] { border-color:var(--amber); color:var(--amber); background:#3b2f17; }
+  .skill.owned::after { content:""; }
+  .detail { margin-top:14px; padding:10px 12px; border-radius:8px; background:var(--tile); min-height:44px; }
+  .empty, .list li { color:var(--muted); }
+  .list { padding-left:18px; }
 </style>
 </head>
 <body>
 <main>
-  <h1>Sinkron Farm</h1>
-  <p class="sub">Masukkan Farm ID untuk memuat coins dan inventory.</p>
-
   <div class="bar">
-    <input id="farmId" type="text" inputmode="numeric" placeholder="Farm ID" aria-label="Farm ID">
-    <button id="btn">Muat farm</button>
+    <label for="farmId">Enter Farm:</label>
+    <input id="farmId" inputmode="numeric" placeholder="Contoh: 3661">
+    <button class="go" id="search">Search</button>
   </div>
   <div id="status" role="status"></div>
 
-  <section id="result" hidden>
-    <div class="stats">
-      <div class="stat"><b id="coins">-</b><span>Coins</span></div>
-      <div class="stat"><b id="balance">-</b><span>Balance</span></div>
-    </div>
-    <input id="filter" type="search" placeholder="Cari item di inventory" aria-label="Cari item">
-    <div class="table" id="inv"></div>
-  </section>
+  <div class="tabs" id="tabs" role="tablist"></div>
+  <section class="panel" id="panel"></section>
 </main>
 
+<script src="data.js"></script>
 <script>
-  const WORKER = "https://sfl.tjaheo89.workers.dev"; // alamat Worker kamu
-  const TTL = 5 * 60 * 1000; // simpan hasil 5 menit agar tidak kena batas request
-
   const $ = (id) => document.getElementById(id);
-  let inventory = [];
+  const el = (tag, cls, text) => {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  };
+  const TABS = ["Skills", "Collectibles", "Wearables", "Buds", "Temporary Buffs", "Updates Made"];
+  const TTL = 5 * 60 * 1000;
 
-  function setStatus(msg, isErr) {
-    $("status").textContent = msg;
-    $("status").className = isErr ? "err" : "";
+  let tab = "Skills", cat = "Minerals", active = null;
+  const selected = new Set();
+
+  const catPoints = (c) => (SKILLS[c] || []).filter(s => selected.has(s.name)).reduce((n, s) => n + s.points, 0);
+  const totalPoints = () => CATEGORIES.reduce((n, c) => n + catPoints(c), 0);
+
+  function status(msg, err) { $("status").textContent = msg; $("status").className = err ? "err" : ""; }
+
+  function renderTabs() {
+    const box = $("tabs"); box.textContent = "";
+    TABS.forEach((t) => {
+      const b = el("button", "tab", t);
+      b.setAttribute("role", "tab");
+      b.setAttribute("aria-selected", t === tab);
+      b.onclick = () => { tab = t; render(); };
+      box.append(b);
+    });
   }
 
-  function render(farm) {
-    $("coins").textContent = Number(farm.coins).toLocaleString("id-ID", { maximumFractionDigits: 2 });
-    $("balance").textContent = Number(farm.balance).toLocaleString("id-ID", { maximumFractionDigits: 4 });
-    inventory = Object.entries(farm.inventory || {}).sort((a, b) => a[0].localeCompare(b[0]));
-    drawInventory();
-    $("result").hidden = false;
+  function renderSkills(p) {
+    const head = el("div", "head");
+    head.append(el("h2", "", `Skill Points Used: ${totalPoints()}`));
+    const clear = el("button", "clear", "Clear Skills");
+    clear.onclick = () => { selected.clear(); active = null; render(); };
+    head.append(clear);
+    p.append(head);
+
+    const chips = el("div", "chips");
+    CATEGORIES.forEach((c) => {
+      const b = el("button", "chip", c);
+      b.setAttribute("aria-pressed", c === cat);
+      b.onclick = () => { cat = c; active = null; render(); };
+      chips.append(b);
+    });
+    p.append(chips);
+
+    const list = SKILLS[cat] || [];
+    p.append(el("h2", "", `${cat}: ${catPoints(cat)} Points Used`));
+    if (!list.length) { p.append(el("p", "empty", "Belum ada skill di kategori ini. Tambahkan di data.js.")); return; }
+
+    [...new Set(list.map(s => s.tier))].sort().forEach((t) => {
+      if (t > 1) p.append(el("h3", "", `Tier ${t} - Points to Unlock: ${TIER_UNLOCK[t] ?? "?"}`));
+      const row = el("div", "tier");
+      list.filter(s => s.tier === t).forEach((s) => {
+        const b = el("button", "skill");
+        b.setAttribute("aria-pressed", selected.has(s.name));
+        b.setAttribute("aria-label", s.name);
+        if (s.icon) { const i = el("img"); i.src = s.icon; i.alt = ""; b.append(i); }
+        else b.textContent = s.name.split(/[\s'-]+/).map(w => w[0]).join("").slice(0, 3).toUpperCase();
+        b.onclick = () => {
+          selected.has(s.name) ? selected.delete(s.name) : selected.add(s.name);
+          active = s; render();
+        };
+        row.append(b);
+      });
+      p.append(row);
+    });
+
+    const d = el("div", "detail");
+    d.textContent = active ? `${active.name}: ${active.effect || "Efek belum diisi di data.js."}` : "Ketuk skill untuk memilih dan melihat efeknya.";
+    p.append(d);
   }
 
-  function drawInventory() {
-    const q = $("filter").value.trim().toLowerCase();
-    const box = $("inv");
-    box.textContent = "";
-    const list = inventory.filter(([name]) => name.toLowerCase().includes(q));
-    if (!list.length) { box.textContent = "Tidak ada item yang cocok."; box.style.padding = "12px"; return; }
-    box.style.padding = "0";
-    for (const [name, qty] of list) {
-      const row = document.createElement("div");
-      row.className = "row";
-      const a = document.createElement("span"); a.textContent = name;
-      const b = document.createElement("span"); b.textContent = Number(qty).toLocaleString("id-ID");
-      row.append(a, b);
-      box.append(row);
+  function render() {
+    renderTabs();
+    const p = $("panel"); p.textContent = "";
+    if (tab === "Skills") return renderSkills(p);
+    if (tab === "Updates Made") {
+      const ul = el("ul", "list");
+      UPDATES.forEach(u => ul.append(el("li", "", `${u.date}: ${u.note}`)));
+      return p.append(ul);
     }
+    p.append(el("p", "empty", `Tab ${tab} belum diisi.`));
   }
 
   function readCache(id) {
-    try {
-      const c = JSON.parse(localStorage.getItem("farm:" + id));
-      return c && c.farm ? c : null;
-    } catch { return null; }
+    try { const c = JSON.parse(localStorage.getItem("farm:" + id)); return c && c.farm ? c : null; }
+    catch { return null; }
   }
 
-  async function load() {
+  function applyFarm(farm) {
+    const owned = Object.keys(farm.bumpkin?.skills || {});
+    const known = new Set(Object.values(SKILLS).flat().map(s => s.name));
+    selected.clear();
+    owned.filter(n => known.has(n)).forEach(n => selected.add(n));
+    render();
+  }
+
+  async function search() {
     const id = $("farmId").value.trim();
-    if (!/^\d+$/.test(id)) return setStatus("Farm ID harus berupa angka.", true);
-
+    if (!/^\d+$/.test(id)) return status("Farm ID harus berupa angka.", true);
     const cached = readCache(id);
-    if (cached && Date.now() - cached.t < TTL) {
-      render(cached.farm);
-      return setStatus("Data dari penyimpanan lokal (kurang dari 5 menit).");
-    }
+    if (cached && Date.now() - cached.t < TTL) { applyFarm(cached.farm); return status("Skill tersinkron (data tersimpan)."); }
 
-    $("btn").disabled = true;
-    setStatus("Memuat data farm...");
+    $("search").disabled = true; status("Memuat farm...");
     try {
       const res = await fetch(`${WORKER}/?id=${encodeURIComponent(id)}`);
       if (res.status === 429) throw new Error("Terlalu banyak permintaan. Tunggu 1-2 menit lalu coba lagi.");
       if (!res.ok) throw new Error(`Gagal memuat (status ${res.status}).`);
-      const data = await res.json();
-      try { localStorage.setItem("farm:" + id, JSON.stringify({ t: Date.now(), farm: data.farm })); } catch {}
-      try { localStorage.setItem("farmId", id); } catch {}
-      render(data.farm);
-      setStatus("Data farm berhasil dimuat.");
-    } catch (e) {
-      if (cached) { render(cached.farm); setStatus(e.message + " Menampilkan data tersimpan.", true); }
-      else setStatus(e.message, true);
-    } finally {
-      $("btn").disabled = false;
-    }
+      const { farm } = await res.json();
+      try { localStorage.setItem("farm:" + id, JSON.stringify({ t: Date.now(), farm })); localStorage.setItem("farmId", id); } catch {}
+      applyFarm(farm); status("Skill tersinkron dari farm.");
+    } catch (e) { status(e.message, true); }
+    finally { $("search").disabled = false; }
   }
 
-  $("btn").addEventListener("click", load);
-  $("farmId").addEventListener("keydown", (e) => { if (e.key === "Enter") load(); });
-  $("filter").addEventListener("input", drawInventory);
+  $("search").onclick = search;
+  $("farmId").onkeydown = (e) => { if (e.key === "Enter") search(); };
   try { $("farmId").value = localStorage.getItem("farmId") || ""; } catch {}
+  render();
 </script>
 </body>
 </html>
