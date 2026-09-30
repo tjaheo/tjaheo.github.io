@@ -78,7 +78,8 @@
   const TABS = ["Skills", "Collectibles", "Wearables", "Buds", "Temporary Buffs", "Updates Made"];
   const TTL = 5 * 60 * 1000;
 
-  let tab = "Skills", cat = "Minerals", active = null, shards = null;
+  let tab = "Skills", cat = "Minerals", active = null, shards = null, island = null;
+  const legacyOwned = new Set();
   const selected = new Set();
 
   const cost = (s) => s.points ?? TIER_COST[s.tier] ?? 1;
@@ -89,6 +90,8 @@
   const need = (c, t) => (TIER_REQUIRE[c] || TIER_REQUIRE.default)[t] ?? 0;
   const unlocked = (c, t) => t <= 1 || spent(c, t - 1) >= need(c, t);
   const validCat = (c) => (SKILLS[c] || []).every(s => !selected.has(s.name) || unlocked(c, s.tier));
+  const islandOk = (s) => !island || !s.island || ISLAND_ORDER.indexOf(island) < 0
+    || ISLAND_ORDER.indexOf(island) >= ISLAND_ORDER.indexOf(s.island);
   const level = () => Math.max(0, parseInt($("level").value, 10) || 0);
   const available = () => pointsForLevel(level());
 
@@ -111,6 +114,10 @@
         return render();
       }
     } else {
+      if (!islandOk(s)) {
+        status(`${s.name} butuh island ${s.island} atau lebih tinggi.`, true);
+        return render();
+      }
       if (!unlocked(cat, s.tier)) {
         status(`Tier ${s.tier} butuh ${need(cat, s.tier)} poin dari tier di bawahnya (sekarang ${spent(cat, s.tier - 1)}).`, true);
         return render();
@@ -157,6 +164,25 @@
     p.append(el("h2", "", `${cat}: ${catPoints(cat)} Points Used`));
     if (!list.length) { p.append(el("p", "empty", "Belum ada skill di kategori ini. Tambahkan di data.js.")); return; }
 
+    if (list.every(s => s.passive)) {
+      p.append(el("p", "empty", "Skill pasif milik beberapa akun. Tidak bisa dibuka dengan skill point. Status dibaca dari farm."));
+      const row = el("div", "tier");
+      list.forEach((s) => {
+        const b = el("button", "skill", s.name.split(/[\s'-]+/).map(w => w[0]).join("").slice(0, 3).toUpperCase());
+        b.setAttribute("aria-pressed", legacyOwned.has(s.name));
+        b.setAttribute("aria-label", s.name);
+        b.onclick = () => { active = s; render(); };
+        row.append(b);
+      });
+      p.append(row);
+      const d = el("div", "detail");
+      d.textContent = active && active.passive
+        ? `${active.name} (${legacyOwned.has(active.name) ? "dimiliki" : "tidak dimiliki"}): ${active.effect}`
+        : "Ketuk skill untuk melihat efeknya. Yang menyala berarti dimiliki farm.";
+      p.append(d);
+      return;
+    }
+
     [...new Set(list.map(s => s.tier))].sort().forEach((t) => {
       if (t > 1) p.append(el("h3", "", `Tier ${t} - butuh ${need(cat, t)} poin dari tier bawah (sekarang ${spent(cat, t - 1)})`));
       const row = el("div", "tier");
@@ -164,7 +190,7 @@
         const b = el("button", "skill");
         b.setAttribute("aria-pressed", selected.has(s.name));
         b.setAttribute("aria-label", s.name);
-        if (!selected.has(s.name) && !unlocked(cat, s.tier)) b.setAttribute("aria-disabled", "true");
+        if (!selected.has(s.name) && (!unlocked(cat, s.tier) || !islandOk(s))) b.setAttribute("aria-disabled", "true");
         if (s.icon) { const i = el("img"); i.src = s.icon; i.alt = ""; b.append(i); }
         else b.textContent = s.name.split(/[\s'-]+/).map(w => w[0]).join("").slice(0, 3).toUpperCase();
         b.onclick = () => toggle(s);
@@ -174,7 +200,7 @@
     });
 
     const d = el("div", "detail");
-    d.textContent = active ? `${active.name} (Tier ${active.tier}, biaya ${cost(active)} poin): ${active.effect || "Efek belum diisi di data.js."}` : "Ketuk skill untuk memilih dan melihat efeknya.";
+    d.textContent = active ? `${active.name} (Tier ${active.tier}, biaya ${cost(active)} poin, island ${active.island || "-"}): ${active.effect || "Efek belum diisi di data.js."}` : "Ketuk skill untuk memilih dan melihat efeknya.";
     p.append(d);
   }
 
@@ -201,6 +227,9 @@
     selected.clear();
     owned.filter(n => known.has(n)).forEach(n => selected.add(n));
     shards = Number(farm.inventory?.["Ascension Shard"] ?? 0);
+    island = farm.island?.type ?? null;
+    legacyOwned.clear();
+    (SKILLS.Legacy || []).filter(s => Number(farm.inventory?.[s.name] ?? 0) > 0).forEach(s => legacyOwned.add(s.name));
     $("level").value = totalLevel(Number(farm.bumpkin?.experience ?? 0), Number(farm.island?.ascensionLevel ?? 0));
     try { localStorage.setItem("level", $("level").value); } catch {}
     render();
