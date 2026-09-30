@@ -39,6 +39,11 @@
   .skill[aria-pressed=true] { border-color:var(--amber); color:var(--amber); background:#3b2f17; }
   .skill.owned::after { content:""; }
   .detail { margin-top:14px; padding:10px 12px; border-radius:8px; background:var(--tile); min-height:44px; }
+  .actions { display:flex; gap:8px; align-items:center; }
+  .lock { width:40px; height:40px; padding:0; border-radius:50%; border:2px solid var(--line); background:#000; line-height:0; }
+  .lock[aria-pressed=true] { border-color:var(--amber); }
+  .lock img { width:100%; height:100%; border-radius:50%; }
+  .clear:disabled { opacity:.4; cursor:not-allowed; }
   .stat-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; align-items:center; }
   .stat { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:6px 12px; font-size:14px; }
   .stat input { width:64px; flex:none; padding:4px 6px; margin-left:6px; }
@@ -78,7 +83,7 @@
   const TABS = ["Skills", "Collectibles", "Wearables", "Buds", "Temporary Buffs", "Updates Made"];
   const TTL = 5 * 60 * 1000;
 
-  let tab = "Skills", cat = "Minerals", active = null, shards = null, island = null;
+  let tab = "Skills", cat = "Minerals", active = null, shards = null, island = null, locked = false;
   const legacyOwned = new Set();
   const selected = new Set();
 
@@ -106,6 +111,7 @@
 
   function toggle(s) {
     active = s;
+    if (locked) return render();
     if (selected.has(s.name)) {
       selected.delete(s.name);
       if (!validCat(cat)) {
@@ -146,9 +152,24 @@
   function renderSkills(p) {
     const head = el("div", "head");
     head.append(el("h2", "", `Skill Points Used: ${totalPoints()}`));
+    const actions = el("div", "actions");
+    const lk = el("button", "lock");
+    const label = locked ? "Buka kunci skill" : "Kunci skill (mode baca)";
+    lk.setAttribute("aria-pressed", locked);
+    lk.setAttribute("aria-label", label);
+    lk.title = label;
+    const img = el("img"); img.src = locked ? "lock.png" : "unlock.png"; img.alt = "";
+    lk.append(img);
+    lk.onclick = () => {
+      locked = !locked;
+      status(locked ? "Terkunci: mengetuk skill hanya menampilkan deskripsi." : "");
+      render();
+    };
     const clear = el("button", "clear", "Clear Skills");
+    clear.disabled = locked;
     clear.onclick = () => { selected.clear(); active = null; render(); };
-    head.append(clear);
+    actions.append(lk, clear);
+    head.append(actions);
     p.append(head);
 
     const chips = el("div", "chips");
@@ -226,6 +247,7 @@
     const known = new Set(Object.values(SKILLS).flat().map(s => s.name));
     selected.clear();
     owned.filter(n => known.has(n)).forEach(n => selected.add(n));
+    locked = true; // setelah sinkron, kunci agar tidak sengaja berubah saat membaca
     shards = Number(farm.inventory?.["Ascension Shard"] ?? 0);
     island = farm.island?.type ?? null;
     legacyOwned.clear();
@@ -239,7 +261,7 @@
     const id = $("farmId").value.trim();
     if (!/^\d+$/.test(id)) return status("Farm ID harus berupa angka.", true);
     const cached = readCache(id);
-    if (cached && Date.now() - cached.t < TTL) { applyFarm(cached.farm); return status("Skill tersinkron (data tersimpan)."); }
+    if (cached && Date.now() - cached.t < TTL) { applyFarm(cached.farm); return status("Skill tersinkron (data tersimpan). Terkunci, ketuk gembok untuk mengubah."); }
 
     $("search").disabled = true; status("Memuat farm...");
     try {
@@ -248,7 +270,7 @@
       if (!res.ok) throw new Error(`Gagal memuat (status ${res.status}).`);
       const { farm } = await res.json();
       try { localStorage.setItem("farm:" + id, JSON.stringify({ t: Date.now(), farm })); localStorage.setItem("farmId", id); } catch {}
-      applyFarm(farm); status("Skill tersinkron dari farm.");
+      applyFarm(farm); status("Skill tersinkron dari farm. Terkunci, ketuk gembok untuk mengubah.");
     } catch (e) { status(e.message, true); }
     finally { $("search").disabled = false; }
   }
