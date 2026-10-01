@@ -10,7 +10,7 @@ Farm ID: `582579771799538`
 .
 ├── index.html              # Kerangka halaman (tanpa logika/CSS inline)
 ├── assets/
-│   ├── css/                # variables.css (warna) · base.css · layout.css · components.css
+│   ├── css/                # variables.css (warna) · base.css · layout.css · components.css · sidebar.css
 │   └── icons/              # lock.png, unlock.png
 ├── src/
 │   ├── main.js             # Titik masuk: event, sinkron farm
@@ -18,7 +18,7 @@ Farm ID: `582579771799538`
 │   ├── state.js            # State aplikasi
 │   ├── core/               # Logika murni: level.js (XP→level), rules.js (poin, tier, island)
 │   ├── services/           # farm-api.js: fetch ke Worker + cache
-│   ├── ui/                 # Render: tabs, stats, skills-tab, updates-tab, render.js
+│   ├── ui/                 # Render: sidebar, tabs, stats, skills-tab, updates-tab, render.js
 │   ├── utils/              # dom.js, storage.js
 │   └── data/               # DATA saja (yang paling sering diedit)
 │       ├── skills/         # Satu file per skill tree + index.js

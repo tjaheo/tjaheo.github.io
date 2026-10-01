@@ -8,13 +8,26 @@
   <link rel="stylesheet" href="assets/css/base.css">
   <link rel="stylesheet" href="assets/css/layout.css">
   <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/sidebar.css">
 </head>
 <body>
-  <main>
-    <div class="bar">
-      <label for="farmId">Enter Farm:</label>
+  <aside class="sidebar" id="sidebar" aria-label="Menu samping">
+    <div class="sidebar-head">
+      <strong>SFL Skill Tree</strong>
+      <button class="icon-btn" id="sidebarClose" aria-label="Sembunyikan sidebar">&times;</button>
+    </div>
+    <div class="side-form">
+      <label for="farmId">Enter Farm</label>
       <input id="farmId" inputmode="numeric" placeholder="Contoh: 3661">
       <button class="go" id="search">Search</button>
+    </div>
+  </aside>
+  <div class="backdrop" id="backdrop"></div>
+
+  <main>
+    <div class="topbar">
+      <button class="icon-btn" id="sidebarToggle" aria-controls="sidebar" aria-expanded="false" aria-label="Tampilkan atau sembunyikan sidebar">&#9776;</button>
+      <h1>SFL Skill Tree</h1>
     </div>
     <div class="stat-row">
       <label class="stat">Level Bumpkin<input id="level" type="number" min="1" max="200"></label>

@@ -6,4 +6,5 @@ export const UPDATES = [
   { date: "2026-09-30", note: "Skill Mining lengkap (15 skill), biaya, dan syarat tier diambil dari kode game." },
   { date: "2026-09-30", note: "Semua skill tree dan kategori Legacy (pasif) ditambahkan dari kode game." },
   { date: "2026-10-01", note: "Struktur kode dirapikan; nama tree disamakan dengan game (Minerals menjadi Mining)." },
+  { date: "2026-10-01", note: "Sidebar kiri (bisa dibuka/tutup); kolom Farm ID dan Search dipindah ke sidebar." },
 ];

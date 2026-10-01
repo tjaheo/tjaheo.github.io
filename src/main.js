@@ -6,6 +6,7 @@ import { totalLevel } from "./core/level.js";
 import { readCache, fetchFarm } from "./services/farm-api.js";
 import { setStatus } from "./ui/status.js";
 import { render } from "./ui/render.js";
+import { initSidebar, closeSidebarOnMobile } from "./ui/sidebar.js";
 
 function setLevel(value) {
   state.level = Math.max(0, parseInt(value, 10) || 0);
@@ -36,6 +37,7 @@ async function search() {
   const cached = readCache(id);
   if (cached) {
     applyFarm(cached);
+    closeSidebarOnMobile();
     return setStatus("Skill tersinkron (data tersimpan). Terkunci, ketuk gembok untuk mengubah.");
   }
 
@@ -43,6 +45,7 @@ async function search() {
   setStatus("Memuat farm...");
   try {
     applyFarm(await fetchFarm(id));
+    closeSidebarOnMobile();
     setStatus("Skill tersinkron dari farm. Terkunci, ketuk gembok untuk mengubah.");
   } catch (e) {
     setStatus(e.message, true);
@@ -62,4 +65,5 @@ $("level").oninput = () => {
   save("level", $("level").value);
   render();
 };
+initSidebar();
 render();

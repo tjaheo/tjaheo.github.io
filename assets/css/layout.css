@@ -1,5 +1,3 @@
-.bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.bar label { color: var(--amber); font-weight: 700; }
 .stat-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; align-items: center; }
 #status { min-height: 1.5em; margin: 10px 0 0; color: var(--muted); font-size: 14px; }
 #status.err { color: var(--err); }

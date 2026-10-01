@@ -1,0 +1,41 @@
+/* Sidebar kiri: bisa dimunculkan/disembunyikan. Lebar diatur lewat --sidebar-w. */
+:root { --sidebar-w: 280px; }
+
+.topbar { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+.topbar h1 { margin: 0; font-size: 20px; color: var(--amber); }
+
+.icon-btn {
+  width: 40px; height: 40px; border-radius: 8px; border: 1px solid var(--line);
+  background: var(--panel); color: var(--amber); font-size: 20px; line-height: 1; padding: 0;
+}
+
+.sidebar {
+  position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w); max-width: 85vw;
+  background: var(--panel); border-right: 1px solid var(--line); padding: 16px;
+  overflow-y: auto; z-index: 20;
+  transform: translateX(-100%); visibility: hidden;
+  transition: transform .25s ease, visibility 0s linear .25s;
+}
+.sidebar-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; color: var(--amber); }
+.side-form { display: flex; flex-direction: column; gap: 8px; }
+.side-form label { color: var(--amber); font-weight: 700; }
+.side-form input { flex: none; width: 100%; }
+
+.backdrop {
+  position: fixed; inset: 0; background: rgba(0, 0, 0, .55); z-index: 10;
+  opacity: 0; pointer-events: none; transition: opacity .25s ease;
+}
+
+body.sidebar-open .sidebar { transform: none; visibility: visible; transition-delay: 0s; }
+body.sidebar-open .backdrop { opacity: 1; pointer-events: auto; }
+
+/* Layar lebar: sidebar mendorong konten, tanpa backdrop. */
+@media (min-width: 900px) {
+  body { transition: padding-left .25s ease; }
+  body.sidebar-open { padding-left: var(--sidebar-w); }
+  body.sidebar-open .backdrop { opacity: 0; pointer-events: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar, .backdrop, body { transition: none; }
+}
