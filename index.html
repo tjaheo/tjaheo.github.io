@@ -1,287 +1,32 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SFL Skill Tree</title>
-<style>
-  :root { --bg:#16130f; --panel:#211c15; --tile:#2c2519; --line:#6b5330; --amber:#f0a020;
-          --ink:#efe6d4; --muted:#a39882; --ok:#7fb069; --err:#ff8a80; }
-  * { box-sizing: border-box; }
-  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.5 system-ui,sans-serif; }
-  main { max-width:820px; margin:0 auto; padding:16px; }
-  .bar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-  .bar label { color:var(--amber); font-weight:700; }
-  input { flex:1; min-width:120px; padding:10px 12px; border-radius:8px; border:1px solid var(--line);
-          background:var(--panel); color:var(--ink); font:inherit; }
-  button { font:inherit; cursor:pointer; }
-  .go { padding:10px 18px; border-radius:20px; border:0; background:var(--amber); color:#2b1c00; font-weight:700; }
-  .go:disabled { opacity:.6; cursor:wait; }
-  :focus-visible { outline:3px solid var(--amber); outline-offset:2px; }
-  #status { min-height:1.5em; margin:10px 0 0; color:var(--muted); font-size:14px; }
-  #status.err { color:var(--err); }
-  .tabs { display:flex; gap:4px; overflow-x:auto; margin-top:12px; }
-  .tab { padding:10px 16px; border:1px solid var(--line); border-bottom:0; border-radius:10px 10px 0 0;
-         background:var(--tile); color:var(--amber); font-weight:700; white-space:nowrap; }
-  .tab[aria-selected=true] { background:var(--panel); color:var(--ink); }
-  .panel { background:var(--panel); border:1px solid var(--line); border-radius:0 12px 12px 12px; padding:16px; min-height:320px; }
-  .head { display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; }
-  .head h2 { margin:0; font-size:20px; color:var(--amber); }
-  .clear { padding:8px 14px; border-radius:18px; border:0; background:var(--amber); color:#2b1c00; font-weight:700; }
-  .chips { display:flex; flex-wrap:wrap; gap:6px; margin:14px 0; padding-bottom:14px; border-bottom:1px solid var(--line); }
-  .chip { padding:6px 12px; border-radius:8px; border:0; background:transparent; color:var(--ink); }
-  .chip[aria-pressed=true] { background:var(--amber); color:#2b1c00; font-weight:700; }
-  h3 { margin:16px 0 8px; font-size:15px; color:var(--amber); }
-  .tier { display:flex; flex-wrap:wrap; gap:8px; }
-  .skill { width:52px; height:52px; border-radius:8px; border:2px solid transparent; background:var(--tile);
-           color:var(--muted); font-weight:700; font-size:13px; padding:0; overflow:hidden; }
-  .skill img { width:100%; height:100%; object-fit:cover; }
-  .skill[aria-pressed=true] { border-color:var(--amber); color:var(--amber); background:#3b2f17; }
-  .skill.owned::after { content:""; }
-  .detail { margin-top:14px; padding:10px 12px; border-radius:8px; background:var(--tile); min-height:44px; }
-  .actions { display:flex; gap:8px; align-items:center; }
-  .lock { width:40px; height:40px; padding:0; border-radius:50%; border:2px solid var(--line); background:#000; line-height:0; }
-  .lock[aria-pressed=true] { border-color:var(--amber); }
-  .lock img { width:100%; height:100%; border-radius:50%; }
-  .clear:disabled { opacity:.4; cursor:not-allowed; }
-  .stat-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; align-items:center; }
-  .stat { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:6px 12px; font-size:14px; }
-  .stat input { width:64px; flex:none; padding:4px 6px; margin-left:6px; }
-  .stat.bad { color:var(--err); }
-  .skill[aria-disabled=true] { opacity:.35; }
-  .empty, .list li { color:var(--muted); }
-  .list { padding-left:18px; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SFL Skill Tree</title>
+  <link rel="stylesheet" href="assets/css/variables.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
 </head>
 <body>
-<main>
-  <div class="bar">
-    <label for="farmId">Enter Farm:</label>
-    <input id="farmId" inputmode="numeric" placeholder="Contoh: 3661">
-    <button class="go" id="search">Search</button>
-  </div>
-  <div class="stat-row">
-    <label class="stat">Level Bumpkin<input id="level" type="number" min="1" max="200"></label>
-    <div class="stat" id="pts"></div>
-    <div class="stat" id="shard"></div>
-  </div>
-  <div id="status" role="status"></div>
+  <main>
+    <div class="bar">
+      <label for="farmId">Enter Farm:</label>
+      <input id="farmId" inputmode="numeric" placeholder="Contoh: 3661">
+      <button class="go" id="search">Search</button>
+    </div>
+    <div class="stat-row">
+      <label class="stat">Level Bumpkin<input id="level" type="number" min="1" max="200"></label>
+      <div class="stat" id="pts"></div>
+      <div class="stat" id="shard"></div>
+    </div>
+    <div id="status" role="status"></div>
 
-  <div class="tabs" id="tabs" role="tablist"></div>
-  <section class="panel" id="panel"></section>
-</main>
+    <div class="tabs" id="tabs" role="tablist"></div>
+    <section class="panel" id="panel"></section>
+  </main>
 
-<script src="data.js"></script>
-<script>
-  const $ = (id) => document.getElementById(id);
-  const el = (tag, cls, text) => {
-    const e = document.createElement(tag);
-    if (cls) e.className = cls;
-    if (text != null) e.textContent = text;
-    return e;
-  };
-  const TABS = ["Skills", "Collectibles", "Wearables", "Buds", "Temporary Buffs", "Updates Made"];
-  const TTL = 5 * 60 * 1000;
-
-  let tab = "Skills", cat = "Minerals", active = null, shards = null, island = null, locked = false;
-  const legacyOwned = new Set();
-  const selected = new Set();
-
-  const cost = (s) => s.points ?? TIER_COST[s.tier] ?? 1;
-  const spent = (c, maxTier = 99) => (SKILLS[c] || [])
-    .filter(s => selected.has(s.name) && s.tier <= maxTier).reduce((n, s) => n + cost(s), 0);
-  const catPoints = (c) => spent(c);
-  const totalPoints = () => CATEGORIES.reduce((n, c) => n + spent(c), 0);
-  const need = (c, t) => (TIER_REQUIRE[c] || TIER_REQUIRE.default)[t] ?? 0;
-  const unlocked = (c, t) => t <= 1 || spent(c, t - 1) >= need(c, t);
-  const validCat = (c) => (SKILLS[c] || []).every(s => !selected.has(s.name) || unlocked(c, s.tier));
-  const islandOk = (s) => !island || !s.island || ISLAND_ORDER.indexOf(island) < 0
-    || ISLAND_ORDER.indexOf(island) >= ISLAND_ORDER.indexOf(s.island);
-  const level = () => Math.max(0, parseInt($("level").value, 10) || 0);
-  const available = () => pointsForLevel(level());
-
-  function status(msg, err) { $("status").textContent = msg; $("status").className = err ? "err" : ""; }
-
-  function renderStats() {
-    const left = available() - totalPoints();
-    $("pts").className = "stat" + (left < 0 ? " bad" : "");
-    $("pts").textContent = `Skill Points: ${totalPoints()} / ${available()} (sisa ${left})`;
-    $("shard").textContent = `Ascension Shard: ${shards ?? "-"}`;
-  }
-
-  function toggle(s) {
-    active = s;
-    if (locked) return render();
-    if (selected.has(s.name)) {
-      selected.delete(s.name);
-      if (!validCat(cat)) {
-        selected.add(s.name);
-        status(`${s.name} tidak bisa dilepas: skill tier atas masih bergantung padanya.`, true);
-        return render();
-      }
-    } else {
-      if (!islandOk(s)) {
-        status(`${s.name} butuh island ${s.island} atau lebih tinggi.`, true);
-        return render();
-      }
-      if (!unlocked(cat, s.tier)) {
-        status(`Tier ${s.tier} butuh ${need(cat, s.tier)} poin dari tier di bawahnya (sekarang ${spent(cat, s.tier - 1)}).`, true);
-        return render();
-      }
-      if (totalPoints() + cost(s) > available()) {
-        status(`Skill Points tidak cukup (butuh ${cost(s)}, sisa ${available() - totalPoints()}).`, true);
-        return render();
-      }
-      selected.add(s.name);
-    }
-    status("");
-    render();
-  }
-
-  function renderTabs() {
-    const box = $("tabs"); box.textContent = "";
-    TABS.forEach((t) => {
-      const b = el("button", "tab", t);
-      b.setAttribute("role", "tab");
-      b.setAttribute("aria-selected", t === tab);
-      b.onclick = () => { tab = t; render(); };
-      box.append(b);
-    });
-  }
-
-  function renderSkills(p) {
-    const head = el("div", "head");
-    head.append(el("h2", "", `Skill Points Used: ${totalPoints()}`));
-    const actions = el("div", "actions");
-    const lk = el("button", "lock");
-    const label = locked ? "Buka kunci skill" : "Kunci skill (mode baca)";
-    lk.setAttribute("aria-pressed", locked);
-    lk.setAttribute("aria-label", label);
-    lk.title = label;
-    const img = el("img"); img.src = locked ? "lock.png" : "unlock.png"; img.alt = "";
-    lk.append(img);
-    lk.onclick = () => {
-      locked = !locked;
-      status(locked ? "Terkunci: mengetuk skill hanya menampilkan deskripsi." : "");
-      render();
-    };
-    const clear = el("button", "clear", "Clear Skills");
-    clear.disabled = locked;
-    clear.onclick = () => { selected.clear(); active = null; render(); };
-    actions.append(lk, clear);
-    head.append(actions);
-    p.append(head);
-
-    const chips = el("div", "chips");
-    CATEGORIES.forEach((c) => {
-      const b = el("button", "chip", c);
-      b.setAttribute("aria-pressed", c === cat);
-      b.onclick = () => { cat = c; active = null; render(); };
-      chips.append(b);
-    });
-    p.append(chips);
-
-    const list = SKILLS[cat] || [];
-    p.append(el("h2", "", `${cat}: ${catPoints(cat)} Points Used`));
-    if (!list.length) { p.append(el("p", "empty", "Belum ada skill di kategori ini. Tambahkan di data.js.")); return; }
-
-    if (list.every(s => s.passive)) {
-      p.append(el("p", "empty", "Skill pasif milik beberapa akun. Tidak bisa dibuka dengan skill point. Status dibaca dari farm."));
-      const row = el("div", "tier");
-      list.forEach((s) => {
-        const b = el("button", "skill", s.name.split(/[\s'-]+/).map(w => w[0]).join("").slice(0, 3).toUpperCase());
-        b.setAttribute("aria-pressed", legacyOwned.has(s.name));
-        b.setAttribute("aria-label", s.name);
-        b.onclick = () => { active = s; render(); };
-        row.append(b);
-      });
-      p.append(row);
-      const d = el("div", "detail");
-      d.textContent = active && active.passive
-        ? `${active.name} (${legacyOwned.has(active.name) ? "dimiliki" : "tidak dimiliki"}): ${active.effect}`
-        : "Ketuk skill untuk melihat efeknya. Yang menyala berarti dimiliki farm.";
-      p.append(d);
-      return;
-    }
-
-    [...new Set(list.map(s => s.tier))].sort().forEach((t) => {
-      if (t > 1) p.append(el("h3", "", `Tier ${t} - butuh ${need(cat, t)} poin dari tier bawah (sekarang ${spent(cat, t - 1)})`));
-      const row = el("div", "tier");
-      list.filter(s => s.tier === t).forEach((s) => {
-        const b = el("button", "skill");
-        b.setAttribute("aria-pressed", selected.has(s.name));
-        b.setAttribute("aria-label", s.name);
-        if (!selected.has(s.name) && (!unlocked(cat, s.tier) || !islandOk(s))) b.setAttribute("aria-disabled", "true");
-        if (s.icon) { const i = el("img"); i.src = s.icon; i.alt = ""; b.append(i); }
-        else b.textContent = s.name.split(/[\s'-]+/).map(w => w[0]).join("").slice(0, 3).toUpperCase();
-        b.onclick = () => toggle(s);
-        row.append(b);
-      });
-      p.append(row);
-    });
-
-    const d = el("div", "detail");
-    d.textContent = active ? `${active.name} (Tier ${active.tier}, biaya ${cost(active)} poin, island ${active.island || "-"}): ${active.effect || "Efek belum diisi di data.js."}` : "Ketuk skill untuk memilih dan melihat efeknya.";
-    p.append(d);
-  }
-
-  function render() {
-    renderTabs(); renderStats();
-    const p = $("panel"); p.textContent = "";
-    if (tab === "Skills") return renderSkills(p);
-    if (tab === "Updates Made") {
-      const ul = el("ul", "list");
-      UPDATES.forEach(u => ul.append(el("li", "", `${u.date}: ${u.note}`)));
-      return p.append(ul);
-    }
-    p.append(el("p", "empty", `Tab ${tab} belum diisi.`));
-  }
-
-  function readCache(id) {
-    try { const c = JSON.parse(localStorage.getItem("farm:" + id)); return c && c.farm ? c : null; }
-    catch { return null; }
-  }
-
-  function applyFarm(farm) {
-    const owned = Object.keys(farm.bumpkin?.skills || {});
-    const known = new Set(Object.values(SKILLS).flat().map(s => s.name));
-    selected.clear();
-    owned.filter(n => known.has(n)).forEach(n => selected.add(n));
-    locked = true; // setelah sinkron, kunci agar tidak sengaja berubah saat membaca
-    shards = Number(farm.inventory?.["Ascension Shard"] ?? 0);
-    island = farm.island?.type ?? null;
-    legacyOwned.clear();
-    (SKILLS.Legacy || []).filter(s => Number(farm.inventory?.[s.name] ?? 0) > 0).forEach(s => legacyOwned.add(s.name));
-    $("level").value = totalLevel(Number(farm.bumpkin?.experience ?? 0), Number(farm.island?.ascensionLevel ?? 0));
-    try { localStorage.setItem("level", $("level").value); } catch {}
-    render();
-  }
-
-  async function search() {
-    const id = $("farmId").value.trim();
-    if (!/^\d+$/.test(id)) return status("Farm ID harus berupa angka.", true);
-    const cached = readCache(id);
-    if (cached && Date.now() - cached.t < TTL) { applyFarm(cached.farm); return status("Skill tersinkron (data tersimpan). Terkunci, ketuk gembok untuk mengubah."); }
-
-    $("search").disabled = true; status("Memuat farm...");
-    try {
-      const res = await fetch(`${WORKER}/?id=${encodeURIComponent(id)}`);
-      if (res.status === 429) throw new Error("Terlalu banyak permintaan. Tunggu 1-2 menit lalu coba lagi.");
-      if (!res.ok) throw new Error(`Gagal memuat (status ${res.status}).`);
-      const { farm } = await res.json();
-      try { localStorage.setItem("farm:" + id, JSON.stringify({ t: Date.now(), farm })); localStorage.setItem("farmId", id); } catch {}
-      applyFarm(farm); status("Skill tersinkron dari farm. Terkunci, ketuk gembok untuk mengubah.");
-    } catch (e) { status(e.message, true); }
-    finally { $("search").disabled = false; }
-  }
-
-  $("search").onclick = search;
-  $("farmId").onkeydown = (e) => { if (e.key === "Enter") search(); };
-  try { $("farmId").value = localStorage.getItem("farmId") || ""; } catch {}
-  try { $("level").value = localStorage.getItem("level") || ""; } catch {}
-  $("level").placeholder = "auto";
-  $("level").oninput = () => { try { localStorage.setItem("level", $("level").value); } catch {} render(); };
-  render();
-</script>
+  <script type="module" src="src/main.js"></script>
 </body>
 </html>
