@@ -1,0 +1,25 @@
+.go { padding: 10px 18px; border-radius: 20px; border: 0; background: var(--amber); color: var(--on-amber); font-weight: 700; }
+.go:disabled { opacity: .6; cursor: wait; }
+.tab {
+  padding: 10px 16px; border: 1px solid var(--line); border-bottom: 0; border-radius: 10px 10px 0 0;
+  background: var(--tile); color: var(--amber); font-weight: 700; white-space: nowrap;
+}
+.tab[aria-selected=true] { background: var(--panel); color: var(--ink); }
+.clear { padding: 8px 14px; border-radius: 18px; border: 0; background: var(--amber); color: var(--on-amber); font-weight: 700; }
+.clear:disabled { opacity: .4; cursor: not-allowed; }
+.chip { padding: 6px 12px; border-radius: 8px; border: 0; background: transparent; color: var(--ink); }
+.chip[aria-pressed=true] { background: var(--amber); color: var(--on-amber); font-weight: 700; }
+.skill {
+  width: 52px; height: 52px; border-radius: 8px; border: 2px solid transparent; background: var(--tile);
+  color: var(--muted); font-weight: 700; font-size: 13px; padding: 0; overflow: hidden;
+}
+.skill img { width: 100%; height: 100%; object-fit: cover; }
+.skill[aria-pressed=true] { border-color: var(--amber); color: var(--amber); background: #3b2f17; }
+.skill[aria-disabled=true] { opacity: .35; }
+.detail { margin-top: 14px; padding: 10px 12px; border-radius: 8px; background: var(--tile); min-height: 44px; }
+.lock { width: 40px; height: 40px; padding: 0; border-radius: 50%; border: 2px solid var(--line); background: #000; line-height: 0; }
+.lock[aria-pressed=true] { border-color: var(--amber); }
+.lock img { width: 100%; height: 100%; border-radius: 50%; }
+.stat { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; font-size: 14px; }
+.stat input { width: 64px; flex: none; padding: 4px 6px; margin-left: 6px; }
+.stat.bad { color: var(--err); }

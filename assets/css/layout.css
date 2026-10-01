@@ -1,0 +1,15 @@
+.bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.bar label { color: var(--amber); font-weight: 700; }
+.stat-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; align-items: center; }
+#status { min-height: 1.5em; margin: 10px 0 0; color: var(--muted); font-size: 14px; }
+#status.err { color: var(--err); }
+.tabs { display: flex; gap: 4px; overflow-x: auto; margin-top: 12px; }
+.panel {
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: 0 12px 12px 12px; padding: 16px; min-height: 320px;
+}
+.head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.head h2 { margin: 0; font-size: 20px; color: var(--amber); }
+.actions { display: flex; gap: 8px; align-items: center; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.tier { display: flex; flex-wrap: wrap; gap: 8px; }

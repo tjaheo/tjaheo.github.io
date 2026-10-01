@@ -1,0 +1,13 @@
+/* Design tokens: ubah warna/tema di sini saja. */
+:root {
+  --bg: #16130f;
+  --panel: #211c15;
+  --tile: #2c2519;
+  --line: #6b5330;
+  --amber: #f0a020;
+  --ink: #efe6d4;
+  --muted: #a39882;
+  --ok: #7fb069;
+  --err: #ff8a80;
+  --on-amber: #2b1c00;
+}
