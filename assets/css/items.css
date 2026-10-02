@@ -1,0 +1,21 @@
+/* Daftar item (Collectibles, Wearables, Buds, Temporary Buffs). */
+.toolbar { margin-top: 12px; display: flex; }
+.toolbar input { width: 100%; }
+.chips.tight { margin: 8px 0; padding-bottom: 0; border-bottom: 0; }
+.count { margin: 8px 0; color: var(--muted); font-size: 14px; }
+.items { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+.item { background: var(--tile); border: 1px solid transparent; border-radius: 8px; padding: 10px 12px; }
+.item.owned { border-color: var(--line); }
+.item-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 4px; }
+.tags { display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end; }
+.tag { padding: 0 8px; border-radius: 10px; background: var(--amber); color: var(--on-amber); font-size: 12px; font-weight: 700; line-height: 20px; }
+.tag.alt { background: transparent; border: 1px solid var(--line); color: var(--amber); }
+.fx { font-size: 14px; }
+.fx-success { color: var(--ok); }
+.fx-info { color: var(--info); }
+.fx-vibrant { color: var(--amber); }
+.fx-danger { color: var(--err); }
+.fx-warning { color: #ffd166; }
+.item .note { margin-top: 4px; color: var(--muted); font-size: 13px; }
+.rules { margin: 6px 0; }
+.rules summary { cursor: pointer; color: var(--amber); font-weight: 700; padding: 6px 0; }

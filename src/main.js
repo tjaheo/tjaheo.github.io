@@ -21,6 +21,7 @@ function applyFarm(farm) {
   state.selected.clear();
   owned.filter((n) => known.has(n)).forEach((n) => state.selected.add(n));
   state.locked = true; // setelah sinkron, kunci agar tidak sengaja berubah saat membaca
+  state.farm = farm;
   state.island = farm.island?.type ?? null;
   // Shard yang sudah dipakai untuk rank ikut dihitung (sama seperti refund saat reset skill di game).
   const spentShards = applyRanks(farm.bumpkin?.skills);

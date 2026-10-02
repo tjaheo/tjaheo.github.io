@@ -10,5 +10,7 @@ export const state = {
   level: 0,          // total level Bumpkin
   legacyOwned: new Set(),
   selected: new Set(),
+  farm: null,        // data farm hasil sinkron (untuk kepemilikan item)
+  view: {},          // filter/pencarian per tab item
   ranks: {},         // nama skill -> rank 1..3 (hanya skill yang bisa di-upgrade)
 };

@@ -34,3 +34,14 @@ Edit `src/config.js`.
 - Aturan rank/Shard: `src/core/rules.js` (`rankUpProblem`). Syarat rank berikutnya: tier tree `min(3, tier skill + rank sekarang)` harus terbuka, plus skill point dan Ascension Shard cukup.
 - Island Ascension (`swamp`, `spooky`, `crystal`, `galaxy`, `marble`) ada di `ISLAND_ORDER` pada `src/data/tiers.js`.
 - Format teks efek per rank: `src/core/rank-text.js`.
+
+## Collectibles, Wearables, Temporary Buffs
+Data `src/data/collectibles.js`, `wearables.js`, dan `temporary.js` **dihasilkan otomatis** dari kode game (teks efek diambil dari kamus bahasa Inggris game). Jangan diedit manual. Untuk memperbarui setelah ada item baru:
+
+```bash
+python3 tools/update_item_data.py
+```
+Butuh internet. Item yang efeknya bergantung pada kondisi (angka dinamis) dilewati. Kepemilikan dibaca dari farm: inventory (collectible), wardrobe (wearable), `collectibles`/`home.collectibles` (terpasang), `boostHistory` dan `buffs` (jendela waktu buff).
+
+## Buds
+Aturan di `src/data/buds.js` (manual, dari `getBudYieldBoosts.ts`): pengali aura, boost type, boost stem. Ubah di sana bila game mengubah angkanya. Buff non-item (mis. Power hour) ada di `src/data/buffs.js`.

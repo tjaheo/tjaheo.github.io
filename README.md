@@ -10,7 +10,7 @@ Farm ID: `582579771799538`
 .
 ├── index.html              # Kerangka halaman (tanpa logika/CSS inline)
 ├── assets/
-│   ├── css/                # variables.css (warna) · base.css · layout.css · components.css · sidebar.css
+│   ├── css/                # variables.css (warna) · base.css · layout.css · components.css · items.css · sidebar.css
 │   └── icons/              # lock.png, unlock.png
 ├── src/
 │   ├── main.js             # Titik masuk: event, sinkron farm
@@ -18,7 +18,7 @@ Farm ID: `582579771799538`
 │   ├── state.js            # State aplikasi
 │   ├── core/               # Logika murni: level.js (XP, Ascension), rules.js (poin, tier, island, rank), rank-text.js
 │   ├── services/           # farm-api.js: fetch ke Worker + cache
-│   ├── ui/                 # Render: sidebar, tabs, stats, skills-tab, updates-tab, render.js
+│   ├── ui/                 # Render: sidebar, tabs, stats, skills-tab, items-tab (daftar item), collectibles/wearables/buds/temporary-tab, updates-tab, render.js
 │   ├── utils/              # dom.js, storage.js
 │   └── data/               # DATA saja (yang paling sering diedit)
 │       ├── skills/         # Satu file per skill tree + index.js
@@ -26,6 +26,7 @@ Farm ID: `582579771799538`
 │       ├── tiers.js        # Syarat tier, biaya, urutan island
 │       ├── level-xp.js     # Tabel XP per level
 │       └── updates.js      # Isi tab "Updates Made"
+├── tools/update_item_data.py  # Perbarui data collectible/wearable dari kode game
 └── docs/ADDING-DATA.md     # Panduan menambah/mengubah data
 ```
 
