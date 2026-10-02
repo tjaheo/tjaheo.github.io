@@ -19,5 +19,12 @@ export const TIER_REQUIRE = {
 // Biaya default per tier. Bisa ditimpa per skill lewat field "points".
 export const TIER_COST = { 1: 1, 2: 2, 3: 3 };
 
-// Island minimum yang dibutuhkan sebuah skill (urut dari terendah).
-export const ISLAND_ORDER = ["basic", "spring", "desert", "volcano"];
+// Urutan island (ISLAND_EXPANSIONS di game, termasuk island Ascension: swamp dst.).
+// Skill butuh island ini atau lebih tinggi.
+export const ISLAND_ORDER = ["basic", "spring", "desert", "volcano", "swamp", "spooky", "crystal", "galaxy", "marble"];
+
+// --- Upgrade rank (Ascension) ---
+// Skill dengan field "upgrade" bisa dinaikkan ranknya 1..MAX_RANK.
+// Tiap kenaikan rank: UPGRADE_POINTS[tier skill] skill point + (tier skill) Ascension Shard.
+export const MAX_RANK = 3;
+export const UPGRADE_POINTS = { 1: 1, 2: 3, 3: 6 };

@@ -7,4 +7,5 @@ export const UPDATES = [
   { date: "2026-09-30", note: "Semua skill tree dan kategori Legacy (pasif) ditambahkan dari kode game." },
   { date: "2026-10-01", note: "Struktur kode dirapikan; nama tree disamakan dengan game (Minerals menjadi Mining)." },
   { date: "2026-10-01", note: "Sidebar kiri (bisa dibuka/tutup); kolom Farm ID dan Search dipindah ke sidebar." },
+  { date: "2026-10-02", note: "Fitur Ascension: upgrade rank skill (1-3) dengan Ascension Shard, info level Ascension dan XP, serta island Ascension (swamp dst.)." },
 ];

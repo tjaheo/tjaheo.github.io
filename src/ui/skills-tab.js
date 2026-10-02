@@ -2,7 +2,12 @@ import { state } from "../state.js";
 import { el, initials } from "../utils/dom.js";
 import { SKILLS } from "../data/skills/index.js";
 import { CATEGORIES } from "../data/categories.js";
-import { cost, spent, totalPoints, available, need, unlocked, validCat, islandOk } from "../core/rules.js";
+import { MAX_RANK } from "../data/tiers.js";
+import { rankLines } from "../core/rank-text.js";
+import {
+  cost, spent, usedPoints, totalPoints, available, need, unlocked, validCat, islandOk,
+  rankOf, rankUpProblem, upgradeCost,
+} from "../core/rules.js";
 import { setStatus } from "./status.js";
 
 function toggle(s, render) {
@@ -11,13 +16,20 @@ function toggle(s, render) {
   if (state.locked) return render();
 
   if (selected.has(s.name)) {
+    const prevRank = state.ranks[s.name];
     selected.delete(s.name);
+    delete state.ranks[s.name];
     if (!validCat(cat)) {
       selected.add(s.name);
+      if (prevRank) state.ranks[s.name] = prevRank;
       setStatus(`${s.name} tidak bisa dilepas: skill tier atas masih bergantung padanya.`, true);
       return render();
     }
   } else {
+    if (s.disabled) {
+      setStatus(`${s.name} sedang dinonaktifkan di game.`, true);
+      return render();
+    }
     if (!islandOk(s)) {
       setStatus(`${s.name} butuh island ${s.island} atau lebih tinggi.`, true);
       return render();
@@ -31,6 +43,7 @@ function toggle(s, render) {
       return render();
     }
     selected.add(s.name);
+    if (s.upgrade) state.ranks[s.name] = 1;
   }
   setStatus("");
   render();
@@ -58,7 +71,7 @@ function renderHeader(panel, render) {
 
   const clear = el("button", "clear", "Clear Skills");
   clear.disabled = state.locked;
-  clear.onclick = () => { state.selected.clear(); state.active = null; render(); };
+  clear.onclick = () => { state.selected.clear(); state.ranks = {}; state.active = null; render(); };
 
   actions.append(lk, clear);
   head.append(actions);
@@ -96,6 +109,41 @@ function renderLegacy(panel, list, render) {
   panel.append(d);
 }
 
+function renderDetail(panel, s, render) {
+  const d = el("div", "detail");
+  if (!s) {
+    d.textContent = "Ketuk skill untuk memilih dan melihat efeknya.";
+    return panel.append(d);
+  }
+  d.append(el("div", "", `${s.name} (Tier ${s.tier}, biaya ${cost(s)} poin, island ${s.island || "-"}): ${s.effect || "Efek belum diisi di src/data/skills/."}${s.disabled ? " [nonaktif di game]" : ""}`));
+
+  if (s.upgrade) {
+    const cur = rankOf(s);
+    const up = upgradeCost(s.tier);
+    d.append(el("div", "rank-note", `Upgrade rank (maks ${MAX_RANK}): ${up.points} poin + ${up.shards} Ascension Shard per rank.`));
+    const ul = el("ul", "ranks");
+    rankLines(s.upgrade).forEach((t, i) => ul.append(el("li", i + 1 === cur ? "on" : "", `Rank ${i + 1}: ${t}`)));
+    d.append(ul);
+
+    if (!state.locked && cur >= 1) {
+      const row = el("div", "actions");
+      const minus = el("button", "step", "Rank -");
+      minus.disabled = cur <= 1;
+      minus.onclick = () => { state.ranks[s.name] = cur - 1; setStatus(""); render(); };
+      const plus = el("button", "step", cur >= MAX_RANK ? "Rank maks" : "Rank +");
+      plus.disabled = cur >= MAX_RANK;
+      plus.onclick = () => {
+        const problem = rankUpProblem(state.cat, s);
+        if (problem) { setStatus(problem, true); return render(); }
+        state.ranks[s.name] = cur + 1; setStatus(""); render();
+      };
+      row.append(minus, plus);
+      d.append(row);
+    }
+  }
+  panel.append(d);
+}
+
 function renderTiers(panel, list, render) {
   const { cat, selected } = state;
   [...new Set(list.map((s) => s.tier))].sort().forEach((t) => {
@@ -108,18 +156,14 @@ function renderTiers(panel, list, render) {
       if (!selected.has(s.name) && (!unlocked(cat, s.tier) || !islandOk(s))) b.setAttribute("aria-disabled", "true");
       if (s.icon) { const i = el("img"); i.src = s.icon; i.alt = ""; b.append(i); }
       else b.textContent = initials(s.name);
+      if (s.upgrade && rankOf(s) > 1) b.append(el("span", "rank", String(rankOf(s))));
       b.onclick = () => toggle(s, render);
       row.append(b);
     });
     panel.append(row);
   });
 
-  const a = state.active;
-  const d = el("div", "detail");
-  d.textContent = a
-    ? `${a.name} (Tier ${a.tier}, biaya ${cost(a)} poin, island ${a.island || "-"}): ${a.effect || "Efek belum diisi di src/data/skills/."}`
-    : "Ketuk skill untuk memilih dan melihat efeknya.";
-  panel.append(d);
+  renderDetail(panel, state.active, render);
 }
 
 export function renderSkills(panel, render) {
@@ -127,7 +171,7 @@ export function renderSkills(panel, render) {
   renderChips(panel, render);
 
   const list = SKILLS[state.cat] || [];
-  panel.append(el("h2", "", `${state.cat}: ${spent(state.cat)} Points Used`));
+  panel.append(el("h2", "", `${state.cat}: ${usedPoints(state.cat)} Points Used`));
   if (!list.length) {
     panel.append(el("p", "empty", "Belum ada skill di kategori ini. Tambahkan di src/data/skills/."));
     return;

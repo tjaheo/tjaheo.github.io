@@ -10,6 +10,7 @@
 .chip { padding: 6px 12px; border-radius: 8px; border: 0; background: transparent; color: var(--ink); }
 .chip[aria-pressed=true] { background: var(--amber); color: var(--on-amber); font-weight: 700; }
 .skill {
+  position: relative;
   width: 52px; height: 52px; border-radius: 8px; border: 2px solid transparent; background: var(--tile);
   color: var(--muted); font-weight: 700; font-size: 13px; padding: 0; overflow: hidden;
 }
@@ -23,3 +24,12 @@
 .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; font-size: 14px; }
 .stat input { width: 64px; flex: none; padding: 4px 6px; margin-left: 6px; }
 .stat.bad { color: var(--err); }
+.skill .rank {
+  position: absolute; right: 2px; bottom: 2px; min-width: 16px; padding: 0 3px; border-radius: 8px;
+  background: var(--amber); color: var(--on-amber); font-size: 11px; line-height: 16px;
+}
+.rank-note { margin-top: 8px; color: var(--muted); font-size: 14px; }
+.ranks { margin: 6px 0; padding-left: 18px; color: var(--muted); font-size: 14px; }
+.ranks .on { color: var(--amber); font-weight: 700; }
+.step { padding: 6px 14px; border-radius: 16px; border: 1px solid var(--line); background: var(--tile); color: var(--amber); font-weight: 700; }
+.step:disabled { opacity: .4; cursor: not-allowed; }

@@ -2,7 +2,8 @@ import { state } from "./state.js";
 import { $ } from "./utils/dom.js";
 import { load, save } from "./utils/storage.js";
 import { SKILLS } from "./data/skills/index.js";
-import { totalLevel } from "./core/level.js";
+import { totalLevel, ascensionInfo } from "./core/level.js";
+import { applyRanks } from "./core/rules.js";
 import { readCache, fetchFarm } from "./services/farm-api.js";
 import { setStatus } from "./ui/status.js";
 import { render } from "./ui/render.js";
@@ -20,13 +21,18 @@ function applyFarm(farm) {
   state.selected.clear();
   owned.filter((n) => known.has(n)).forEach((n) => state.selected.add(n));
   state.locked = true; // setelah sinkron, kunci agar tidak sengaja berubah saat membaca
-  state.shards = Number(farm.inventory?.["Ascension Shard"] ?? 0);
   state.island = farm.island?.type ?? null;
+  // Shard yang sudah dipakai untuk rank ikut dihitung (sama seperti refund saat reset skill di game).
+  const spentShards = applyRanks(farm.bumpkin?.skills);
+  state.shards = Number(farm.inventory?.["Ascension Shard"] ?? 0) + spentShards;
   state.legacyOwned.clear();
   (SKILLS.Legacy || [])
     .filter((s) => Number(farm.inventory?.[s.name] ?? 0) > 0)
     .forEach((s) => state.legacyOwned.add(s.name));
-  setLevel(totalLevel(Number(farm.bumpkin?.experience ?? 0), Number(farm.island?.ascensionLevel ?? 0)));
+  const xp = Number(farm.bumpkin?.experience ?? 0);
+  const asc = Number(farm.island?.ascensionLevel ?? 0);
+  state.asc = ascensionInfo(xp, asc);
+  setLevel(totalLevel(xp, asc));
   render();
 }
 

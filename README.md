@@ -16,7 +16,7 @@ Farm ID: `582579771799538`
 │   ├── main.js             # Titik masuk: event, sinkron farm
 │   ├── config.js           # URL Worker, lama cache, daftar tab
 │   ├── state.js            # State aplikasi
-│   ├── core/               # Logika murni: level.js (XP→level), rules.js (poin, tier, island)
+│   ├── core/               # Logika murni: level.js (XP, Ascension), rules.js (poin, tier, island, rank), rank-text.js
 │   ├── services/           # farm-api.js: fetch ke Worker + cache
 │   ├── ui/                 # Render: sidebar, tabs, stats, skills-tab, updates-tab, render.js
 │   ├── utils/              # dom.js, storage.js
