@@ -11,6 +11,8 @@ export const state = {
   legacyOwned: new Set(),
   selected: new Set(),
   farm: null,        // data farm hasil sinkron (untuk kepemilikan item)
-  view: {},          // filter/pencarian per tab item
+  view: {},          // pencarian/grup per tab item
+  picked: {},        // item terpilih per tab (Set nama)
+  itemActive: {},    // item yang sedang dilihat efeknya per tab
   ranks: {},         // nama skill -> rank 1..3 (hanya skill yang bisa di-upgrade)
 };

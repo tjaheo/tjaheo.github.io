@@ -80,6 +80,31 @@ def effects(body, dic, hours=None, ts=""):
     out.sort(key=lambda e: e[0].startswith("Lasts for"))   # durasi di baris terakhir
     return out
 
+def helper_fertilisers(ts, dic):
+    """Pupuk di getFertiliserBuffLabels (Sprout Mix dst.): ambil efek dasar (label pertama) tiap cabang."""
+    start = ts.index("export function getFertiliserBuffLabels")
+    h = ts[start:ts.index("\n}\n", start)]
+    marks = list(re.finditer(r'if \(fertiliser === "([^"]+)"\) \{', h))
+    out = []
+    for i, m in enumerate(marks):
+        seg = h[m.end():marks[i + 1].start() if i + 1 < len(marks) else len(h)]
+        ef = effects(seg, dic)[:1]
+        if ef:
+            out.append({"name": m.group(1), "effects": ef})
+    # Cabang terakhir tanpa `if` sendiri: cari nama di tipe FertiliserBuffLabelName, cocokkan lewat kunci kamus.
+    t = ts[ts.index("type FertiliserBuffLabelName"):start]
+    for name in re.findall(r'"([^"]+)"', t):
+        if name in {o["name"] for o in out}:
+            continue
+        slug = name.lower().replace(" ", ".")
+        for keys, kind in labels(h):
+            if any(slug in k for k in keys):
+                base = min(keys, key=len)
+                if base in dic and "{{" not in dic[base]:
+                    out.append({"name": name, "effects": [[dic[base], kind]]})
+                break
+    return out
+
 def js_items(rows):
     return ",\n".join("  " + json.dumps(r, ensure_ascii=False) for r in rows)
 
@@ -103,8 +128,6 @@ def main():
         if ef:
             # "Bull Run" di kode game hanya penanda untuk sisa item (bukan kategori sebenarnya).
             grp = it["cat"] if it["cat"] not in (None, "Bull Run", "All items go above this line") else "Other"
-            if it["name"] in hours:
-                grp = "Temporary"
             collectibles.append({"name": it["name"], "group": grp, "effects": ef})
 
     wearables = []
@@ -114,17 +137,32 @@ def main():
             if ef and it["name"] not in {w["name"] for w in wearables}:
                 wearables.append({"name": it["name"], "effects": ef})
 
-    names = {c["name"] for c in collectibles}
-    temp = [{"name": n, "hours": h} for n, h in hours.items() if n in names]
+    # Collectible permanen vs sementara/sekali pakai.
+    #  - Sementara: item berdurasi (totem, hourglass, shrine) dan pupuk/consumable (grup "Fertilisers").
+    CONSUMABLE_GROUPS = {"Fertilisers"}
+    permanent, temp = [], []
+    for c in collectibles:
+        if c["name"] in hours:
+            temp.append({"name": c["name"], "group": "Shrine" if c["name"].endswith("Shrine") else "Totem & Hourglass",
+                         "hours": hours[c["name"]], "effects": c["effects"]})
+        elif c["group"] in CONSUMABLE_GROUPS:
+            temp.append({"name": c["name"], "group": "Pupuk & Consumable", "effects": c["effects"]})
+        else:
+            permanent.append(c)
+    for f in helper_fertilisers(col, dic):
+        temp.append({"name": f["name"], "group": "Pupuk & Consumable", "effects": f["effects"]})
+    order = {"Totem & Hourglass": 0, "Shrine": 1, "Pupuk & Consumable": 2}
+    temp.sort(key=lambda t: order[t["group"]])
+    collectibles = permanent
 
     def write(fn, head, const, rows):
         with open(os.path.join(OUT, fn), "w", encoding="utf8") as f:
             f.write(f"// {head}\n// DIHASILKAN oleh tools/update_item_data.py - jangan edit manual.\n")
             f.write(f"export const {const} = [\n{js_items(rows)}\n];\n")
 
-    write("collectibles.js", "Boost collectible. Format: { name, group, effects: [[teks, tipe], ...] }", "COLLECTIBLES", collectibles)
+    write("collectibles.js", "Boost collectible PERMANEN. Format: { name, group, effects: [[teks, tipe], ...] }", "COLLECTIBLES", collectibles)
     write("wearables.js", "Boost wearable. Format: { name, effects: [[teks, tipe], ...] }", "WEARABLES", wearables)
-    write("temporary.js", "Item sementara (durasi dalam jam), dari EXPIRY_COOLDOWNS. Efeknya ada di collectibles.js.", "TEMPORARY_ITEMS", temp)
-    print(f"collectibles={len(collectibles)} wearables={len(wearables)} temporary={len(temp)}")
+    write("temporary.js", "Item sementara/sekali pakai (totem, hourglass, shrine, pupuk). Format: { name, group, hours?, effects }", "TEMPORARY_ITEMS", temp)
+    print(f"collectibles(permanen)={len(collectibles)} wearables={len(wearables)} temporary={len(temp)}")
 
 main()

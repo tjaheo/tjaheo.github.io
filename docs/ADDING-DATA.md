@@ -36,12 +36,17 @@ Edit `src/config.js`.
 - Format teks efek per rank: `src/core/rank-text.js`.
 
 ## Collectibles, Wearables, Temporary Buffs
-Data `src/data/collectibles.js`, `wearables.js`, dan `temporary.js` **dihasilkan otomatis** dari kode game (teks efek diambil dari kamus bahasa Inggris game). Jangan diedit manual. Untuk memperbarui setelah ada item baru:
+Data `src/data/collectibles.js`, `wearables.js`, dan `temporary.js` **dihasilkan otomatis** dari kode game (teks efek dari kamus bahasa Inggris game). Jangan diedit manual. Untuk memperbarui setelah ada item baru:
 
 ```bash
 python3 tools/update_item_data.py
 ```
-Butuh internet. Item yang efeknya bergantung pada kondisi (angka dinamis) dilewati. Kepemilikan dibaca dari farm: inventory (collectible), wardrobe (wearable), `collectibles`/`home.collectibles` (terpasang), `boostHistory` dan `buffs` (jendela waktu buff).
+Butuh internet. Pembagian:
+- **Collectibles**: hanya boost permanen (item yang dipasang di farm).
+- **Temporary Buffs**: item berdurasi (totem, hourglass, shrine), pupuk/consumable (Rapid Root, Sprout Mix, Salt Lick, dll.), dan buff non-item di `src/data/buffs.js` (Power hour).
+- Efek yang angkanya bergantung kondisi (dinamis) dilewati supaya tidak salah.
+
+Cara pakai di web: ketuk ikon untuk memilih, ketuk gembok agar ketukan hanya menampilkan efek (pilihan tidak berubah). Setelah sinkron farm, item yang dimiliki otomatis terpilih dan terkunci. Kepemilikan dibaca dari inventory (collectible, pupuk), wardrobe (wearable), `collectibles`/`home.collectibles` (terpasang), serta `boostHistory` dan `buffs` (jendela waktu buff).
 
 ## Buds
 Aturan di `src/data/buds.js` (manual, dari `getBudYieldBoosts.ts`): pengali aura, boost type, boost stem. Ubah di sana bila game mengubah angkanya. Buff non-item (mis. Power hour) ada di `src/data/buffs.js`.

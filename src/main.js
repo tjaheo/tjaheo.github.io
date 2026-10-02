@@ -4,6 +4,7 @@ import { load, save } from "./utils/storage.js";
 import { SKILLS } from "./data/skills/index.js";
 import { totalLevel, ascensionInfo } from "./core/level.js";
 import { applyRanks } from "./core/rules.js";
+import { syncPicks } from "./core/ownership.js";
 import { readCache, fetchFarm } from "./services/farm-api.js";
 import { setStatus } from "./ui/status.js";
 import { render } from "./ui/render.js";
@@ -22,6 +23,7 @@ function applyFarm(farm) {
   owned.filter((n) => known.has(n)).forEach((n) => state.selected.add(n));
   state.locked = true; // setelah sinkron, kunci agar tidak sengaja berubah saat membaca
   state.farm = farm;
+  syncPicks();
   state.island = farm.island?.type ?? null;
   // Shard yang sudah dipakai untuk rank ikut dihitung (sama seperti refund saat reset skill di game).
   const spentShards = applyRanks(farm.bumpkin?.skills);

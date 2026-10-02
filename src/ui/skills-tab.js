@@ -9,6 +9,7 @@ import {
   rankOf, rankUpProblem, upgradeCost,
 } from "../core/rules.js";
 import { setStatus } from "./status.js";
+import { renderLockHeader } from "./header.js";
 
 function toggle(s, render) {
   const { cat, selected } = state;
@@ -50,32 +51,11 @@ function toggle(s, render) {
 }
 
 function renderHeader(panel, render) {
-  const head = el("div", "head");
-  head.append(el("h2", "", `Skill Points Used: ${totalPoints()}`));
-
-  const actions = el("div", "actions");
-  const lk = el("button", "lock");
-  const label = state.locked ? "Buka kunci skill" : "Kunci skill (mode baca)";
-  lk.setAttribute("aria-pressed", state.locked);
-  lk.setAttribute("aria-label", label);
-  lk.title = label;
-  const img = el("img");
-  img.src = state.locked ? "assets/icons/lock.png" : "assets/icons/unlock.png";
-  img.alt = "";
-  lk.append(img);
-  lk.onclick = () => {
-    state.locked = !state.locked;
-    setStatus(state.locked ? "Terkunci: mengetuk skill hanya menampilkan deskripsi." : "");
-    render();
-  };
-
-  const clear = el("button", "clear", "Clear Skills");
-  clear.disabled = state.locked;
-  clear.onclick = () => { state.selected.clear(); state.ranks = {}; state.active = null; render(); };
-
-  actions.append(lk, clear);
-  head.append(actions);
-  panel.append(head);
+  renderLockHeader(panel, render, {
+    title: `Skill Points Used: ${totalPoints()}`,
+    clearLabel: "Clear Skills",
+    onClear: () => { state.selected.clear(); state.ranks = {}; state.active = null; },
+  });
 }
 
 function renderChips(panel, render) {

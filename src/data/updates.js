@@ -9,4 +9,5 @@ export const UPDATES = [
   { date: "2026-10-01", note: "Sidebar kiri (bisa dibuka/tutup); kolom Farm ID dan Search dipindah ke sidebar." },
   { date: "2026-10-02", note: "Fitur Ascension: upgrade rank skill (1-3) dengan Ascension Shard, info level Ascension dan XP, serta island Ascension (swamp dst.)." },
   { date: "2026-10-03", note: "Tab Collectibles, Wearables, Buds, dan Temporary Buffs: daftar boost, kepemilikan dari farm, pencarian dan filter." },
+  { date: "2026-10-04", note: "Collectibles/Wearables/Temporary Buffs jadi grid ikon yang bisa dipilih + gembok. Collectibles hanya boost permanen; pupuk (Rapid Root dll.), totem, hourglass, shrine pindah ke Temporary Buffs." },
 ];
