@@ -16,5 +16,6 @@ export const state = {
   picked: {},        // item terpilih per tab (Set nama)
   itemActive: {},    // item yang sedang dilihat efeknya per tab
   buds: [],          // Bud: { id, type, stem, aura, placed }
+  calc: { mode: "day", period: "day", fert: "", plots: null, allSeasons: false, open: null }, // kalkulator crops
   ranks: {},         // nama skill -> rank 1..3 (hanya skill yang bisa di-upgrade)
 };

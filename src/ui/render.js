@@ -8,6 +8,7 @@ import { renderCollectibles } from "./collectibles-tab.js";
 import { renderWearables } from "./wearables-tab.js";
 import { renderBuds } from "./buds-tab.js";
 import { renderTemporary } from "./temporary-tab.js";
+import { renderCrops } from "./crops-tab.js";
 
 // Daftar renderer per tab. Tab baru: tambahkan di sini.
 const RENDERERS = {
@@ -16,6 +17,7 @@ const RENDERERS = {
   "Wearables": renderWearables,
   "Buds": renderBuds,
   "Temporary Buffs": renderTemporary,
+  "Crops": renderCrops,
   "Updates Made": renderUpdates,
 };
 

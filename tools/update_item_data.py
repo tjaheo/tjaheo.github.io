@@ -141,6 +141,40 @@ def write_resources():
         f.write("export const RESOURCES = [\n" + js_items(uniq) + "\n];\n")
     print(f"resources={len(uniq)}")
 
+def write_crops():
+    """Data crop plot untuk kalkulator: harga seed/jual, waktu panen, kategori, musim, level."""
+    crops_ts, seeds_ts = get("features/game/types/crops.ts"), get("features/game/types/seeds.ts")
+    num = lambda m: eval(m.group(1)) if m else None
+    crops = {}
+    for e in entries(block(crops_ts, "CROPS")):
+        crops[e["name"]] = {"sell": num(re.search(r"sellPrice:\s*([\d.*\s()+]+)", e["body"])),
+                            "seconds": num(re.search(r"harvestSeconds:\s*([\d.*\s()+]+)", e["body"]))}
+    seeds = {}
+    for e in entries(block(crops_ts, "CROP_SEEDS")):
+        y = re.search(r'yield:\s*"([^"]+)"', e["body"])
+        lv = re.search(r"bumpkinLevel:\s*\{\s*ascension:\s*(\d+),\s*level:\s*(\d+)", e["body"])
+        if y:
+            seeds[y.group(1)] = {"seed": e["name"], "price": num(re.search(r"price:\s*([\d.*\s()+]+)", e["body"])),
+                                 "ascension": int(lv.group(1)) if lv else 0, "level": int(lv.group(2)) if lv else 1}
+    season_src = block(seeds_ts, "SEASONAL_SEEDS")
+    seasons = {sn: re.findall(r'"([^"]+ Seed)"', re.search(sn + r":\s*\[(.*?)\]", season_src, re.S).group(1))
+               for sn in ("spring", "summer", "autumn", "winter")}
+    basic_max, adv_min, overnight = crops["Pumpkin"]["seconds"], crops["Eggplant"]["seconds"], crops["Radish"]["seconds"]
+    rows = []
+    for n, c in crops.items():
+        sd = seeds.get(n)
+        if not sd:
+            continue
+        sec = c["seconds"]
+        rows.append({"name": n, "seed": sd["seed"], "seedPrice": sd["price"], "sellPrice": c["sell"], "seconds": sec,
+                     "tier": "basic" if sec <= basic_max else "advanced" if sec >= adv_min else "medium",
+                     "overnight": sec >= overnight, "seasons": [k for k, v in seasons.items() if sd["seed"] in v],
+                     "ascension": sd["ascension"], "level": sd["level"]})
+    with open(os.path.join(OUT, "crops.js"), "w", encoding="utf8") as f:
+        f.write("// Data crop plot (harga dalam coins, waktu dalam detik, tanpa boost).\n// DIHASILKAN oleh tools/update_item_data.py - jangan edit manual.\n")
+        f.write("export const CROPS = [\n" + js_items(rows) + "\n];\n")
+    print(f"crops={len(rows)}")
+
 def js_items(rows):
     return ",\n".join("  " + json.dumps(r, ensure_ascii=False) for r in rows)
 
@@ -200,6 +234,7 @@ def main():
     write("wearables.js", "Boost wearable. Format: { name, effects: [[teks, tipe], ...] }", "WEARABLES", wearables)
     write("temporary.js", "Item sementara/sekali pakai (totem, hourglass, shrine, pupuk). Format: { name, group, hours?, effects }", "TEMPORARY_ITEMS", temp)
     write_resources()
+    write_crops()
     print(f"collectibles(permanen)={len(collectibles)} wearables={len(wearables)} temporary={len(temp)}")
 
 main()

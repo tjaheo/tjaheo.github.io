@@ -25,3 +25,13 @@
 .best { background: var(--tile); border-radius: 8px; padding: 8px 12px; }
 .best-group { margin-top: 6px; color: var(--amber); font-weight: 700; font-size: 13px; }
 .item .actions { margin-top: 8px; }
+.check { display: flex; align-items: center; gap: 8px; margin: 6px 0; font-size: 14px; }
+.hint { color: var(--muted); font-size: 13px; margin: 6px 0; }
+.table-wrap { overflow-x: auto; margin-top: 10px; }
+table.calc { width: 100%; border-collapse: collapse; font-size: 14px; }
+table.calc th { text-align: left; color: var(--amber); padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+table.calc td { padding: 8px; border-bottom: 1px solid var(--tile); }
+table.calc tbody tr:not(.detail-row) { cursor: pointer; }
+table.calc tr.open td { background: var(--tile); }
+table.calc td:nth-child(n+3), table.calc th:nth-child(n+3) { text-align: right; }
+table.calc .detail { margin: 0; }

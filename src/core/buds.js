@@ -42,3 +42,24 @@ export function budLines(bud) {
 // Bud dari data farm: { id, type, stem, aura, placed }.
 export const budsFromFarm = (farmBuds) =>
   Object.entries(farmBuds || {}).map(([id, b]) => ({ id: `#${id}`, type: b.type, stem: b.stem, aura: b.aura, placed: !!b.coordinates }));
+
+// Boost hasil Bud terbaik untuk satu crop plot (getBudYieldBoosts di game). { boost, bud } atau null.
+export function budYieldFor(cropName, buds = state.buds) {
+  const r = RESOURCES.find((x) => x.name === cropName && x.kind === "crop");
+  let best = null;
+  buds.filter((b) => b.placed).forEach((b) => {
+    const v = r ? budBoost(b, r) : 0;
+    if (v > 0 && (!best || v > best.boost)) best = { boost: v, bud: b };
+  });
+  return best;
+}
+
+// Boost kecepatan Bud (type Saphiro: waktu tumbuh x(1 - aura x 0.1) untuk crop). { mult, bud } atau null.
+export function budSpeed(buds = state.buds) {
+  let best = null;
+  buds.filter((b) => b.placed && b.type === "Saphiro").forEach((b) => {
+    const m = Number((1 - auraOf(b) * 0.1).toFixed(4));
+    if (!best || m < best.mult) best = { mult: m, bud: b };
+  });
+  return best;
+}

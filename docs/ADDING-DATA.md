@@ -54,3 +54,14 @@ Panel di sidebar (`src/ui/settings.js`, logika `src/core/settings.js`, pilihan `
 ## Buds
 Tab Buds = Bud Builder: tambah Bud (type, stem, aura), pasang/cabut, dan lihat boost terbaik per resource. Setelah Search, Bud dari farm masuk otomatis. Aturan di `src/data/buds.js` (manual, dari `getBudYieldBoosts.ts`): pengali aura, `TYPE_RULES`, `STEM_RULES` (kriteria `match` mengacu ke `src/data/resources.js`). Perhitungan di `src/core/buds.js`. `resources.js` dihasilkan oleh `tools/update_item_data.py` (kategori crop basic/medium/advanced dari waktu panen, sama seperti game). Buff non-item (mis. Power hour) ada di `src/data/buffs.js`.
 
+
+## Kalkulator Crops
+- **Data crop** (`src/data/crops.js`, DIHASILKAN oleh `tools/update_item_data.py`): harga seed, harga jual, waktu panen dasar, kategori, musim.
+- **Mesin hitung** (`src/core/crop-calc.js`): port dari `getCropTime`/`getCropPlotTime` (plant.ts) dan `getMultiplicativeCropYield`/`getCropYieldAmount` (harvest.ts). Urutan sama dengan game: hasil dikali dulu, lalu ditambah, lalu event (Insect Plague x0.5, Bountiful Harvest +1); hasil dibulatkan ke bawah 4 desimal.
+- **Menambah/mengubah boost:** edit tabel di awal file (`TIME_BY_CROP`, `YIELD_MUL_BY_CROP`, `YIELD_ADD_BY_CROP`, `YIELD_CHANCE_BY_CROP`) atau fungsi `growthTime` / `harvestYield` untuk aturan khusus. Nilai rank skill dibaca dari `upgrade` di `src/data/skills/`.
+- **Sumber boost:** semua pilihan Anda: skill + rank (tab Skills), collectible (Collectibles), wearable (Wearables), Bud, buff sementara, pupuk (dropdown di tab Crops), serta musim/event (sidebar). Setelah Search, yang otomatis terpilih = collectible terpasang, wearable dipakai, dan buff aktif.
+- **Rata-rata:** boost berpeluang (Green Amulet, Peeled/Potent Potato, Stellar Sunflower, Radical Radish) dihitung sebagai nilai harapan.
+- **Jalur game:** memakai jalur tanpa flag beta `SPEED_BOOSTS` (boost kecepatan mengurangi waktu di awal).
+- **Belum dimodelkan:** AOE berbasis posisi (Scary Mike, Laurie, Sir Goldensnout, Queen Cornelia, Gnome-Cobalt-Clementine, Basic/Chonky Scarecrow), Bee Swarm, guardian cuaca, diskon harga seed, dan bonus harga jual.
+- **Cara memeriksa:** ketuk baris crop untuk rincian tiap boost, lalu bandingkan dengan angka di game.
+- **Tes:** nilai hitungan tangan dari kode game ada di riwayat pengerjaan; saat mengubah aturan, hitung ulang contoh sederhana (mis. Nancy x0.85 x Lunar Calendar x0.9).

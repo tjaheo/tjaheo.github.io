@@ -50,12 +50,14 @@ export function lastWindow(item) {
   return w ? { start: w.from, end: w.to } : null;
 }
 
-// Setelah sinkron farm: item yang dimiliki otomatis terpilih (Temporary: yang dimiliki atau sedang aktif).
+// Setelah sinkron farm, yang terpilih = yang BENAR-BENAR berlaku di game:
+// collectible terpasang, wearable yang dipakai, dan buff sementara yang sedang aktif.
+// (Kepemilikan tetap terlihat di panel detail tiap item.)
 export function syncPicks() {
   state.picked = {
-    Collectibles: new Set(COLLECTIBLES.filter((i) => collectibleOwned(i.name) > 0).map((i) => i.name)),
-    Wearables: new Set(WEARABLES.filter((i) => wearableOwned(i.name) > 0).map((i) => i.name)),
-    "Temporary Buffs": new Set(TEMP_ITEMS.filter((i) => (i.buff ? activeWindow(i) : collectibleOwned(i.name) > 0)).map((i) => i.name)),
+    Collectibles: new Set(COLLECTIBLES.filter((i) => collectiblePlaced(i.name) > 0).map((i) => i.name)),
+    Wearables: new Set(WEARABLES.filter((i) => wearableEquipped(i.name)).map((i) => i.name)),
+    "Temporary Buffs": new Set(TEMP_ITEMS.filter((i) => activeWindow(i)).map((i) => i.name)),
   };
   state.itemActive = {};
 }

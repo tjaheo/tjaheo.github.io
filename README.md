@@ -16,9 +16,9 @@ Farm ID: `582579771799538`
 │   ├── main.js             # Titik masuk: event, sinkron farm
 │   ├── config.js           # URL Worker, lama cache, daftar tab
 │   ├── state.js            # State aplikasi
-│   ├── core/               # Logika murni: level.js (XP, Ascension), rules.js (poin, tier, island, rank), rank-text.js
+│   ├── core/               # Logika murni: level.js (XP, Ascension), rules.js (poin, tier, island, rank), buds.js, crop-calc.js (kalkulator), rank-text.js, ownership.js
 │   ├── services/           # farm-api.js: fetch ke Worker + cache
-│   ├── ui/                 # Render: sidebar, tabs, stats, skills-tab, items-tab (daftar item), settings (sidebar), header (gembok), collectibles/wearables/buds/temporary-tab, updates-tab, render.js
+│   ├── ui/                 # Render: sidebar, tabs, stats, skills-tab, items-tab (daftar item), settings (sidebar), header (gembok), collectibles/wearables/buds/temporary/crops-tab, updates-tab, render.js
 │   ├── utils/              # dom.js, storage.js
 │   └── data/               # DATA saja (yang paling sering diedit)
 │       ├── skills/         # Satu file per skill tree + index.js

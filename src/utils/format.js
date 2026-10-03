@@ -8,3 +8,9 @@ export function fmtDuration(ms) {
 }
 
 export const hoursText = (h) => (h % 24 === 0 && h >= 24 ? `${h / 24} hari` : `${h} jam`);
+
+// Durasi dalam detik -> teks ringkas (detik untuk < 1 menit).
+export const fmtSeconds = (sec) => (sec < 60 ? `${Math.round(sec)} dtk` : fmtDuration(sec * 1000));
+
+// Angka dengan pemisah ribuan lokal; desimal secukupnya.
+export const fmtNum = (n, max = 2) => Number(n).toLocaleString("id-ID", { maximumFractionDigits: max });
