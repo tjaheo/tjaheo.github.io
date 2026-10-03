@@ -39,3 +39,8 @@ body.sidebar-open .backdrop { opacity: 1; pointer-events: auto; }
 @media (prefers-reduced-motion: reduce) {
   .sidebar, .backdrop, body { transition: none; }
 }
+
+.side-settings { margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; }
+.side-settings h3 { margin: 0; }
+.side-settings .field select, .side-settings .field input { width: 100%; }
+.side-settings .hint { margin: 0; color: var(--muted); font-size: 12px; }

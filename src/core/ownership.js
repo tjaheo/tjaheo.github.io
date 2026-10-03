@@ -29,7 +29,6 @@ export const boostWindows = (name) => state.farm?.boostHistory?.[name] ?? [];
 // Info buff dari farm.buffs (mis. Power hour): { startedAt, durationMS } atau null.
 export const farmBuff = (name) => state.farm?.buffs?.[name] ?? null;
 
-export const budsList = () => Object.entries(state.farm?.buds || {});
 
 // Jendela buff yang sedang berlaku untuk item sementara: { start, end } atau null.
 export function activeWindow(item, now = Date.now()) {

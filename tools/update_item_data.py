@@ -16,7 +16,8 @@ def get(path):
 
 def block(ts, name):
     """Isi objek `export const NAME ... > = { ... }`."""
-    a = re.compile(r"> = \{").search(ts, ts.index("export const " + name)).end() - 1
+    start = re.search(r"export const " + name + r"\b", ts).start()   # \b: hindari cocok ke NAME_SEEDS dst.
+    a = re.compile(r"> = \{").search(ts, start).end() - 1
     depth = 0
     for b in range(a, len(ts)):
         depth += (ts[b] == "{") - (ts[b] == "}")
@@ -105,6 +106,41 @@ def helper_fertilisers(ts, dic):
                 break
     return out
 
+def write_resources():
+    """Daftar resource + kategori (dipakai aturan boost Bud). Kategori crop: dari harvestSeconds, sama seperti isBasicCrop/isAdvancedCrop di game."""
+    crops_ts, fruits_ts, animals_ts = (get("features/game/types/" + f) for f in ("crops.ts", "fruits.ts", "animals.ts"))
+
+    def hs(ts, name):
+        out = {}
+        for e in entries(block(ts, name)):
+            m = re.search(r"harvestSeconds:\s*([\d\s*+()]+)", e["body"])
+            out[e["name"]] = eval(m.group(1)) if m else None
+        return out
+
+    crops = hs(crops_ts, "CROPS")
+    basic_max, adv_min = crops["Pumpkin"], crops["Eggplant"]
+    rows = []
+    for n, sec in crops.items():
+        tier = "basic" if sec <= basic_max else "advanced" if sec >= adv_min else "medium"
+        rows.append({"name": n, "kind": "crop", "tier": tier})
+    rows += [{"name": e["name"], "kind": "gh-crop"} for e in entries(block(crops_ts, "GREENHOUSE_CROPS"))]
+    for tbl in ("PATCH_FRUIT", "GREENHOUSE_FRUIT"):
+        rows += [{"name": e["name"], "kind": "fruit"} for e in entries(block(fruits_ts, tbl))]
+    rows += [{"name": n, "kind": "mineral"} for n in ("Stone", "Iron", "Gold")]
+    rows += [{"name": "Wood", "kind": "wood"}, {"name": "Wild Mushroom", "kind": "mushroom"}, {"name": "Magic Mushroom", "kind": "mushroom"}]
+    drops = block(animals_ts, "ANIMAL_RESOURCE_DROP")
+    for n in dict.fromkeys(re.findall(r"\b(Egg|Feather|Milk|Leather|Wool|Merino Wool)\b", drops)):
+        rows.append({"name": n, "kind": "animal"})
+    seen, uniq = set(), []
+    for r in rows:
+        if (r["name"], r["kind"]) not in seen:
+            seen.add((r["name"], r["kind"])); uniq.append(r)
+    with open(os.path.join(OUT, "resources.js"), "w", encoding="utf8") as f:
+        f.write("// Daftar resource + kategori untuk aturan boost Bud.\n// DIHASILKAN oleh tools/update_item_data.py - jangan edit manual.\n")
+        f.write("// kind: crop (plot; tier basic|medium|advanced), gh-crop, fruit, mineral, wood, mushroom, animal\n")
+        f.write("export const RESOURCES = [\n" + js_items(uniq) + "\n];\n")
+    print(f"resources={len(uniq)}")
+
 def js_items(rows):
     return ",\n".join("  " + json.dumps(r, ensure_ascii=False) for r in rows)
 
@@ -163,6 +199,7 @@ def main():
     write("collectibles.js", "Boost collectible PERMANEN. Format: { name, group, effects: [[teks, tipe], ...] }", "COLLECTIBLES", collectibles)
     write("wearables.js", "Boost wearable. Format: { name, effects: [[teks, tipe], ...] }", "WEARABLES", wearables)
     write("temporary.js", "Item sementara/sekali pakai (totem, hourglass, shrine, pupuk). Format: { name, group, hours?, effects }", "TEMPORARY_ITEMS", temp)
+    write_resources()
     print(f"collectibles(permanen)={len(collectibles)} wearables={len(wearables)} temporary={len(temp)}")
 
 main()

@@ -19,3 +19,9 @@
 .detail .fx, .sum-row .fx { font-size: 14px; }
 .detail .note { margin-top: 4px; color: var(--muted); font-size: 13px; }
 .sum-row { padding: 6px 0; border-top: 1px solid var(--line); }
+.bud-form { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; margin: 12px 0; }
+.field { display: flex; flex-direction: column; gap: 2px; font-size: 13px; color: var(--amber); font-weight: 700; }
+.field select, .field input { padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: inherit; font-weight: 400; }
+.best { background: var(--tile); border-radius: 8px; padding: 8px 12px; }
+.best-group { margin-top: 6px; color: var(--amber); font-weight: 700; font-size: 13px; }
+.item .actions { margin-top: 8px; }

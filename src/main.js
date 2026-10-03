@@ -5,6 +5,9 @@ import { SKILLS } from "./data/skills/index.js";
 import { totalLevel, ascensionInfo } from "./core/level.js";
 import { applyRanks } from "./core/rules.js";
 import { syncPicks } from "./core/ownership.js";
+import { budsFromFarm } from "./core/buds.js";
+import { loadSettings, applyFarmSettings } from "./core/settings.js";
+import { initSettings, syncSettingsForm } from "./ui/settings.js";
 import { readCache, fetchFarm } from "./services/farm-api.js";
 import { setStatus } from "./ui/status.js";
 import { render } from "./ui/render.js";
@@ -24,7 +27,9 @@ function applyFarm(farm) {
   state.locked = true; // setelah sinkron, kunci agar tidak sengaja berubah saat membaca
   state.farm = farm;
   syncPicks();
-  state.island = farm.island?.type ?? null;
+  applyFarmSettings(farm);
+  syncSettingsForm();
+  state.buds = budsFromFarm(farm.buds);
   // Shard yang sudah dipakai untuk rank ikut dihitung (sama seperti refund saat reset skill di game).
   const spentShards = applyRanks(farm.bumpkin?.skills);
   state.shards = Number(farm.inventory?.["Ascension Shard"] ?? 0) + spentShards;
@@ -74,5 +79,7 @@ $("level").oninput = () => {
   save("level", $("level").value);
   render();
 };
+loadSettings();
+initSettings(render);
 initSidebar();
 render();

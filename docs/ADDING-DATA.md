@@ -48,5 +48,9 @@ Butuh internet. Pembagian:
 
 Cara pakai di web: ketuk ikon untuk memilih, ketuk gembok agar ketukan hanya menampilkan efek (pilihan tidak berubah). Setelah sinkron farm, item yang dimiliki otomatis terpilih dan terkunci. Kepemilikan dibaca dari inventory (collectible, pupuk), wardrobe (wearable), `collectibles`/`home.collectibles` (terpasang), serta `boostHistory` dan `buffs` (jendela waktu buff).
 
+## Pengaturan Farm
+Panel di sidebar (`src/ui/settings.js`, logika `src/core/settings.js`, pilihan `src/data/settings.js`): island, musim, VIP, event hari ini, harga 1 Gem (USD), dan nilai 1 FLOWER (coins). Disimpan di localStorage. Saat Search, island/musim/VIP/event diisi dari farm (`island.type`, `season.season`, `vip.expiresAt`, `calendar`); angka Gem dan FLOWER diisi manual. Island yang dipilih dipakai untuk mengecek syarat island skill, dan semua kalkulator nanti membaca pengaturan ini.
+
 ## Buds
-Aturan di `src/data/buds.js` (manual, dari `getBudYieldBoosts.ts`): pengali aura, boost type, boost stem. Ubah di sana bila game mengubah angkanya. Buff non-item (mis. Power hour) ada di `src/data/buffs.js`.
+Tab Buds = Bud Builder: tambah Bud (type, stem, aura), pasang/cabut, dan lihat boost terbaik per resource. Setelah Search, Bud dari farm masuk otomatis. Aturan di `src/data/buds.js` (manual, dari `getBudYieldBoosts.ts`): pengali aura, `TYPE_RULES`, `STEM_RULES` (kriteria `match` mengacu ke `src/data/resources.js`). Perhitungan di `src/core/buds.js`. `resources.js` dihasilkan oleh `tools/update_item_data.py` (kategori crop basic/medium/advanced dari waktu panen, sama seperti game). Buff non-item (mis. Power hour) ada di `src/data/buffs.js`.
+
