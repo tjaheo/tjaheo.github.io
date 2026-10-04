@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="assets/css/layout.css">
   <link rel="stylesheet" href="assets/css/components.css">
   <link rel="stylesheet" href="assets/css/items.css">
+  <link rel="stylesheet" href="assets/css/calculator.css">
   <link rel="stylesheet" href="assets/css/sidebar.css">
 </head>
 <body>
@@ -30,8 +31,12 @@
     <div class="topbar">
       <button class="icon-btn" id="sidebarToggle" aria-controls="sidebar" aria-expanded="false" aria-label="Tampilkan atau sembunyikan sidebar">&#9776;</button>
       <h1>SFL Skill Tree</h1>
+      <nav class="nav" aria-label="Halaman">
+        <button class="nav-btn" id="navCombo">Combo Maker</button>
+        <button class="nav-btn" id="navCalc">Calculator</button>
+      </nav>
     </div>
-    <div class="stat-row">
+    <div class="stat-row" id="statRow">
       <label class="stat">Level Bumpkin<input id="level" type="number" min="1" max="200"></label>
       <div class="stat" id="asc" hidden></div>
       <div class="stat" id="pts"></div>

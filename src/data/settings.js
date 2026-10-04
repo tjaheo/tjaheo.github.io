@@ -26,11 +26,22 @@ export const EVENTS = {
   fishFrenzy: "Fish Frenzy",
 };
 
+// Paket Gems (harga USD). Sumber: daftar paket di sflhub.xyz (bukan dari kode game); ubah di sini bila berubah.
+export const GEM_PACKS = [
+  { gems: 100, usd: 1.03 },
+  { gems: 650, usd: 5.19 },
+  { gems: 1350, usd: 10.39 },
+  { gems: 2800, usd: 20.79 },
+  { gems: 15500, usd: 103.99 },
+  { gems: 200000, usd: 1039.99 },
+];
+
 export const DEFAULT_SETTINGS = {
   island: "",        // "" = belum dipilih (syarat island skill tidak dicek)
   season: "",
   vip: false,
   event: "",         // "" = tidak ada event
-  gemUsd: "",        // harga 1 Gem dalam USD (opsional, untuk biaya restock)
-  flowerCoins: "",   // nilai 1 FLOWER dalam coins (opsional)
+  gemPack: "",       // jumlah Gems paket yang dipakai membeli Gems ("" = biaya restock tidak dihitung)
+  flowerUsd: "",     // harga 1 FLOWER dalam USD
+  flowerCoins: "",   // nilai 1 FLOWER dalam coins
 };

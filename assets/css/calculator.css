@@ -1,0 +1,31 @@
+/* Halaman Calculator (tata letak seperti sflhub). */
+.nav { display: flex; gap: 6px; margin-left: auto; }
+.nav-btn { padding: 8px 14px; border-radius: 18px; border: 1px solid var(--line); background: var(--panel); color: var(--amber); font-weight: 700; }
+.nav-btn[aria-current=true] { background: var(--amber); color: var(--on-amber); border-color: var(--amber); }
+.topbar { flex-wrap: wrap; }
+
+.panel.calc-page { background: none; border: 0; padding: 0; min-height: 0; }
+.calc-box { background: var(--panel); border: 2px solid var(--line); border-radius: 0 12px 12px 12px; padding: 16px; }
+.calc-box .chips { border-bottom: 1px solid var(--line); margin-top: 0; }
+.help-btn { margin: 4px 0 12px; padding: 6px 12px; border-radius: 16px; border: 1px solid var(--line); background: var(--tile); color: var(--amber); font-weight: 700; font-size: 13px; }
+.go.small { padding: 4px 12px; font-size: 12px; }
+
+.dash { background: #1a1610; border-radius: 12px; padding: 14px; margin: 8px 0 14px; }
+.cards { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.card { min-width: 130px; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; text-align: center; font-size: 13px; }
+.card-title { color: var(--amber); font-weight: 700; margin-bottom: 4px; }
+.card-sep { color: var(--amber); font-weight: 700; font-size: 20px; }
+
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; }
+.ctable { border-collapse: collapse; min-width: 1250px; width: 100%; font-size: 13px; }
+.ctable th { color: var(--amber); padding: 10px 8px; border-bottom: 2px solid var(--line); text-align: center; vertical-align: middle; background: var(--panel); }
+.ctable td { padding: 8px; text-align: center; border-bottom: 1px solid var(--tile); vertical-align: middle; }
+.ctable tbody tr:nth-child(odd) td { background: #1d1912; }
+.ctable td:first-child, .ctable th:first-child { position: sticky; left: 0; z-index: 1; text-align: left; background: var(--panel); border-right: 1px solid var(--line); }
+.ctable .sub { color: var(--muted); font-size: 12px; }
+.ctable input { width: 100%; min-width: 80px; padding: 6px 8px; flex: none; text-align: center; }
+.ctable .fee { display: flex; align-items: center; gap: 4px; justify-content: center; font-size: 12px; font-weight: 400; margin-top: 4px; }
+.ctable .fee input { width: 56px; min-width: 0; padding: 2px 4px; }
+.ctable .link { background: none; border: 0; color: var(--ink); font-weight: 700; padding: 0; text-decoration: underline dotted; }
+.ctable .detail-row td { text-align: left; background: var(--tile); }
+.ctable .detail-row .detail { margin: 0; }

@@ -16,6 +16,13 @@ export const state = {
   picked: {},        // item terpilih per tab (Set nama)
   itemActive: {},    // item yang sedang dilihat efeknya per tab
   buds: [],          // Bud: { id, type, stem, aura, placed }
-  calc: { mode: "day", period: "day", fert: "", plots: null, allSeasons: false, open: null }, // kalkulator crops
+  page: "combo",     // "combo" (Combo Maker) atau "calc" (Calculator)
+  calc: {            // kalkulator (input disimpan oleh core/calc-store.js)
+    group: "crops", sub: "crops",       // tab atas dan sub-tab (hanya tampilan)
+    mode: "seed", restock: "deduct",    // seed | cycle | stock ; deduct | keep
+    plots: null, fert: "", warehouse: null, allSeasons: false,
+    seeds: {}, fee: 0, p2p: {},         // input per crop: jumlah seed/siklus/stok, harga P2P (FLOWER)
+    open: null, help: false, scroll: 0,
+  },
   ranks: {},         // nama skill -> rank 1..3 (hanya skill yang bisa di-upgrade)
 };

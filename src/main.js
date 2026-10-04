@@ -8,6 +8,7 @@ import { syncPicks } from "./core/ownership.js";
 import { budsFromFarm } from "./core/buds.js";
 import { loadSettings, applyFarmSettings } from "./core/settings.js";
 import { initSettings, syncSettingsForm } from "./ui/settings.js";
+import { loadCalc } from "./core/calc-store.js";
 import { readCache, fetchFarm } from "./services/farm-api.js";
 import { setStatus } from "./ui/status.js";
 import { render } from "./ui/render.js";
@@ -80,6 +81,14 @@ $("level").oninput = () => {
   render();
 };
 loadSettings();
+loadCalc();
 initSettings(render);
+// Navigasi halaman: #/calculator = Calculator, selain itu = Combo Maker.
+const pageFromHash = () => (location.hash === "#/calculator" ? "calc" : "combo");
+const go = (page) => { location.hash = page === "calc" ? "#/calculator" : "#/"; };
+state.page = pageFromHash();
+$("navCombo").onclick = () => go("combo");
+$("navCalc").onclick = () => go("calc");
+window.addEventListener("hashchange", () => { state.page = pageFromHash(); render(); });
 initSidebar();
 render();

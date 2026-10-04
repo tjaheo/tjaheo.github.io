@@ -14,3 +14,22 @@ export const fmtSeconds = (sec) => (sec < 60 ? `${Math.round(sec)} dtk` : fmtDur
 
 // Angka dengan pemisah ribuan lokal; desimal secukupnya.
 export const fmtNum = (n, max = 2) => Number(n).toLocaleString("id-ID", { maximumFractionDigits: max });
+
+// Detik -> "00d 00:00:00" (gaya sflhub).
+export function fmtClock(sec) {
+  const t = Math.max(0, Math.round(sec));
+  const d = Math.floor(t / 86400), h = Math.floor((t % 86400) / 3600), m = Math.floor((t % 3600) / 60), x = t % 60;
+  const p = (n) => String(n).padStart(2, "0");
+  return `${p(d)}d ${p(h)}:${p(m)}:${p(x)}`;
+}
+
+// Detik -> "hh:mm:ss" (jam bisa lebih dari 24, mis. 48:00:00).
+export function fmtHms(sec) {
+  const t = Math.max(0, Math.round(sec));
+  const p = (n) => String(n).padStart(2, "0");
+  return `${p(Math.floor(t / 3600))}:${p(Math.floor((t % 3600) / 60))}:${p(t % 60)}`;
+}
+
+// Angka dengan desimal tetap antara min dan max (gaya sflhub: 18,00 / 0,000010).
+export const fmtDec = (n, min = 2, max = min) =>
+  Number(n).toLocaleString("id-ID", { minimumFractionDigits: min, maximumFractionDigits: max });

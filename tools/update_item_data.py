@@ -175,6 +175,17 @@ def write_crops():
         f.write("export const CROPS = [\n" + js_items(rows) + "\n];\n")
     print(f"crops={len(rows)}")
 
+def write_stock():
+    """Stok seed dasar di toko (INITIAL_STOCK di lib/constants.ts). Warehouse menambah 20% (dibulatkan ke atas)."""
+    ts = get("features/game/lib/constants.ts")
+    a = ts.index("const seeds: Record<SeedName, Decimal> = {")
+    seg = ts[a:ts.index("\n  };", a)]
+    stock = {m.group(1): int(m.group(2)) for m in re.finditer(r'"([^"]+)": new Decimal\((\d+)\)', seg)}
+    with open(os.path.join(OUT, "stock.js"), "w", encoding="utf8") as f:
+        f.write("// Stok seed dasar per restock (tanpa Warehouse). DIHASILKAN oleh tools/update_item_data.py.\n")
+        f.write("export const SEED_STOCK = {\n" + ",\n".join(f"  {json.dumps(k)}: {v}" for k, v in stock.items()) + ",\n};\n")
+    print(f"stock={len(stock)}")
+
 def js_items(rows):
     return ",\n".join("  " + json.dumps(r, ensure_ascii=False) for r in rows)
 
@@ -235,6 +246,7 @@ def main():
     write("temporary.js", "Item sementara/sekali pakai (totem, hourglass, shrine, pupuk). Format: { name, group, hours?, effects }", "TEMPORARY_ITEMS", temp)
     write_resources()
     write_crops()
+    write_stock()
     print(f"collectibles(permanen)={len(collectibles)} wearables={len(wearables)} temporary={len(temp)}")
 
 main()

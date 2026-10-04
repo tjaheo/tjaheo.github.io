@@ -11,5 +11,5 @@ export const UPDATES = [
   { date: "2026-10-03", note: "Tab Collectibles, Wearables, Buds, dan Temporary Buffs: daftar boost, kepemilikan dari farm, pencarian dan filter." },
   { date: "2026-10-04", note: "Collectibles/Wearables/Temporary Buffs jadi grid ikon yang bisa dipilih + gembok. Collectibles hanya boost permanen; pupuk (Rapid Root dll.), totem, hourglass, shrine pindah ke Temporary Buffs." },
   { date: "2026-10-05", note: "Pengaturan Farm di sidebar (island, musim, VIP, event, Gem, FLOWER; terisi dari farm) dan Bud Builder (tambah Bud, boost terbaik per resource)." },
-  { date: "2026-10-06", note: "Tab Crops: kalkulator profit crop (per seed, per siklus, per hari/minggu) dengan rincian boost; pilihan otomatis setelah Search kini collectible terpasang, wearable dipakai, buff aktif." },
+  { date: "2026-10-06", note: "Halaman Calculator terpisah (tata letak sflhub): tab Crops / CM / Fruits / GH, Minerals, Animals; kalkulator Crops dengan mode Per Seed/Cycle/Stock, restock, kartu ringkasan 24 jam dan mingguan, Betty vs P2P. Pilihan otomatis setelah Search kini collectible terpasang, wearable dipakai, buff aktif." },
 ];

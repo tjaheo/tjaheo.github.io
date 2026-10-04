@@ -1,7 +1,7 @@
 // Panel "Pengaturan Farm" di sidebar. Dipakai kalkulator (island, musim, VIP, event, harga).
 import { state } from "../state.js";
 import { $, el } from "../utils/dom.js";
-import { ISLANDS, SEASONS, EVENTS } from "../data/settings.js";
+import { ISLANDS, SEASONS, EVENTS, GEM_PACKS } from "../data/settings.js";
 import { updateSettings } from "../core/settings.js";
 
 function choice(label, id, map, none) {
@@ -31,7 +31,8 @@ export function initSettings(render) {
     choice("Musim", "setSeason", SEASONS, "- belum dipilih -"),
     choice("VIP", "setVip", { yes: "Ya" }, "Tidak"),
     choice("Event hari ini", "setEvent", EVENTS, "Tidak ada"),
-    number("Harga 1 Gem (USD)", "setGem", "contoh 0.01"),
+    choice("Paket Gems", "setGem", Object.fromEntries(GEM_PACKS.map((p) => [p.gems, `${p.gems.toLocaleString("id-ID")} Gems - $${p.usd}`])), "- biaya restock tidak dihitung -"),
+    number("Harga 1 FLOWER (USD)", "setFlowerUsd", "contoh 0.01"),
     number("Nilai 1 FLOWER (coins)", "setFlower", "contoh 200"),
     el("p", "hint", "Island, musim, VIP, dan event terisi otomatis saat Search; bisa diubah manual."),
   );
@@ -40,7 +41,8 @@ export function initSettings(render) {
   on("setSeason", "season", (v) => v);
   on("setVip", "vip", (v) => v === "yes");
   on("setEvent", "event", (v) => v);
-  on("setGem", "gemUsd", (v) => v);
+  on("setGem", "gemPack", (v) => v);
+  on("setFlowerUsd", "flowerUsd", (v) => v);
   on("setFlower", "flowerCoins", (v) => v);
   syncSettingsForm();
 }
@@ -52,6 +54,7 @@ export function syncSettingsForm() {
   $("setSeason").value = s.season;
   $("setVip").value = s.vip ? "yes" : "";
   $("setEvent").value = s.event;
-  $("setGem").value = s.gemUsd;
+  $("setGem").value = s.gemPack;
+  $("setFlowerUsd").value = s.flowerUsd;
   $("setFlower").value = s.flowerCoins;
 }
